@@ -3,18 +3,20 @@ package crud
 import (
 	"errors"
 	"fmt"
+	"github.com/iancoleman/strcase"
 	"gorm.io/gorm"
 	"log"
+	"strings"
 )
 
-var AndValueNotSlice = errors.New("the value of $and not array")
+var AndValueNotSlice = errors.New("the value of $and or $or not array")
 
-func searchToQuery(s map[string]interface{}, tx *gorm.DB) (error, *gorm.DB) {
+func searchMapper(s map[string]interface{}, tx *gorm.DB) error {
 	for k := range s {
 		if k == AND {
 			vals, ok := s[k].([]interface{})
 			if !ok {
-				return AndValueNotSlice, nil
+				return AndValueNotSlice
 			}
 			for _, field := range vals {
 				keyAndVal, ok := field.(map[string]interface{})
@@ -43,7 +45,7 @@ func searchToQuery(s map[string]interface{}, tx *gorm.DB) (error, *gorm.DB) {
 		} else if k == OR {
 			vals, ok := s[k].([]interface{})
 			if !ok {
-				return AndValueNotSlice, nil
+				return AndValueNotSlice
 			}
 			for i, field := range vals {
 				keyAndVal, ok := field.(map[string]interface{})
@@ -80,5 +82,13 @@ func searchToQuery(s map[string]interface{}, tx *gorm.DB) (error, *gorm.DB) {
 		}
 
 	}
-	return nil, tx
+	return nil
+}
+
+func relationsMapper(joinString string, tx *gorm.DB) {
+	relations := strings.Split(joinString, ",")
+	for _, relation := range relations {
+		log.Printf("will preload -> %v", strcase.ToCamel(relation))
+		tx.Preload(strcase.ToCamel(relation))
+	}
 }

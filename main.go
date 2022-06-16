@@ -4,7 +4,6 @@ import (
 	"github.com/ElegantSoft/go-crud-starter/crud"
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
-	"github.com/ElegantSoft/go-crud-starter/db/seed"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
@@ -44,7 +43,7 @@ func main() {
 
 	crud.RegisterRoutes(crudGroup)
 
-	seed.SeedPosts()
+	//seed.SeedPosts()
 
 	err := server.Run()
 	if err != nil {

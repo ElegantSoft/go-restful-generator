@@ -6,20 +6,20 @@ import (
 )
 
 type Post struct {
-	ID          uuid.UUID `json:"id" gorm:"type:uuid; default:uuid_generate_v4()"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	CategoryID  uuid.UUID `json:"category_id"`
-	Category    Category  `json:"category"`
-	Price       uint32    `json:"price"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          uuid.UUID `json:"id,omitempty" gorm:"type:uuid; default:uuid_generate_v4()"`
+	Title       string    `json:"title,omitempty"`
+	Description string    `json:"description,omitempty"`
+	CategoryID  uuid.UUID `json:"category_id,omitempty"`
+	Category    Category  `json:"category,omitempty"`
+	Price       uint32    `json:"price,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
 }
 
 type Category struct {
-	ID        uuid.UUID `json:"id" gorm:"type:uuid; default:uuid_generate_v4()"`
-	Name      string    `json:"name,omitempty"`
-	Posts     []Post    `json:"posts,omitempty"`
-	UpdatedAt time.Time `json:"updated_at"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        uuid.UUID `json:"id,omitempty" gorm:"type:uuid; default:uuid_generate_v4()"`
+	Name      string    `json:"name,omitempty,omitempty"`
+	Posts     []Post    `json:"posts,omitempty,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
 }

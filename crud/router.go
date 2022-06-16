@@ -20,10 +20,6 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 			return
 		}
 
-		if len(api.Fields) > 0 {
-			api.Fields = strings.Split(api.Fields[0], ",")
-		}
-
 		if len(api.S) > 0 {
 			err := json.Unmarshal([]byte(api.S), &s)
 			if err != nil {
@@ -33,20 +29,28 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 
 		var result []models.Post
 		tx := db.DB.Model(models.Post{})
+
+		if len(api.Fields) > 0 {
+			fields := strings.Split(api.Fields, ",")
+			tx.Select(fields)
+		}
+		if len(api.Join) > 0 {
+			relationsMapper(api.Join, tx)
+		}
 		if api.Page > 0 {
 			tx.Limit(int(api.Limit)).Offset(int((api.Page - 1) * api.Limit))
 		}
-		err, transaction := searchToQuery(s, tx.Model(&models.Post{}))
+		err := searchMapper(s, tx)
 		if err != nil {
 			log.Printf("err -> %+v", err)
 		}
-		transaction.Scan(&result)
+		tx.Find(&result)
 
 		log.Printf("api params -> %+v", api)
 		log.Printf("search is -> %+v", s)
 		var data interface{}
 		var totalRows int64
-		db.DB.Model(&models.Post{}).Count(&totalRows)
+		tx.Count(&totalRows)
 		if api.Page > 0 {
 			data = map[string]interface{}{
 				"data":       result,
