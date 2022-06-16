@@ -1,0 +1,3 @@
+
+
+GET http://localhost:8080/crud?page=1&limit=20&fields=name,age&s={"$and":[{"isActive": true, "age": {"$ne": 10}}]}

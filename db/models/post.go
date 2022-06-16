@@ -9,6 +9,7 @@ type Post struct {
 	Description string   `json:"description"`
 	CategoryID  uint     `json:"category_id"`
 	Category    Category `json:"category"`
+	Price       uint32   `json:"price"`
 }
 
 type Category struct {

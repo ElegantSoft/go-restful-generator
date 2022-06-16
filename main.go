@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ElegantSoft/go-crud-starter/crud"
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
 	"github.com/gin-gonic/gin"
@@ -34,6 +35,10 @@ func main() {
 	); err != nil {
 		log.Fatal(err)
 	}
+
+	crudGroup := server.Group("crud")
+
+	crud.RegisterRoutes(crudGroup)
 
 	err := server.Run()
 	if err != nil {
