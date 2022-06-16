@@ -17,42 +17,68 @@ func searchToQuery(s map[string]interface{}, tx *gorm.DB) (error, *gorm.DB) {
 				return AndValueNotSlice, nil
 			}
 			for _, field := range vals {
-				log.Printf("field -> %+v", field)
-				fieldQuery, ok := field.(map[string]map[string]interface{})
+				keyAndVal, ok := field.(map[string]interface{})
 				if ok {
-					log.Printf("field is ok-> %+v", field)
-					for whereField, whereValStruct := range fieldQuery {
-						for whereOperator, whereValue := range whereValStruct {
-							operator, ok := filterConditions[whereOperator]
-							if ok {
-								log.Printf("whereField -> %+v whereValue -> %+v operator -> %+v", whereField, whereValue, operator)
-								//tx = tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), whereValue)
+					for whereField, whereVal := range keyAndVal {
+						whereValMap, ok := whereVal.(map[string]interface{})
+						if ok {
+							for operatorKey, value := range whereValMap {
+								operator, ok := filterConditions[operatorKey]
+								if ok {
+									if operatorKey == "$cont" {
+										value = fmt.Sprintf("%%%s%%", value)
+										log.Println(value)
+									}
+									tx = tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
+								}
 							}
+
+						} else {
+
+							tx = tx.Where(whereField, whereVal)
 						}
 					}
-				} else {
-					keyAndVal, ok := field.(map[string]interface{})
-					if ok {
-						for whereField, whereVal := range keyAndVal {
-							whereValMap, ok := whereVal.(map[string]interface{})
-							if ok {
-								log.Printf("dynamic -> %+v", whereValMap)
-								for operatorKey, value := range whereValMap {
-									operator, ok := filterConditions[operatorKey]
-									if ok {
+				}
+			}
+		} else if k == OR {
+			vals, ok := s[k].([]interface{})
+			if !ok {
+				return AndValueNotSlice, nil
+			}
+			for i, field := range vals {
+				keyAndVal, ok := field.(map[string]interface{})
+				if ok {
+					for whereField, whereVal := range keyAndVal {
+						whereValMap, ok := whereVal.(map[string]interface{})
+						if ok {
+							for operatorKey, value := range whereValMap {
+								operator, ok := filterConditions[operatorKey]
+								if ok {
+									if operatorKey == "$cont" {
+										value = fmt.Sprintf("%%%s%%", value)
+										log.Println(value)
+									}
+									if i == 0 {
 										tx = tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
+									} else {
+										tx = tx.Or(fmt.Sprintf("%s %s ?", whereField, operator), value)
 									}
 								}
+							}
 
-							} else {
-
+						} else {
+							if i == 0 {
 								tx = tx.Where(whereField, whereVal)
+							} else {
+								tx = tx.Or(whereField, whereVal)
 							}
 						}
 					}
 				}
 			}
+
 		}
+
 	}
 	return nil, tx
 }

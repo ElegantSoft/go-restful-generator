@@ -4,6 +4,7 @@ import (
 	"github.com/ElegantSoft/go-crud-starter/crud"
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
+	"github.com/ElegantSoft/go-crud-starter/db/seed"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
@@ -29,6 +30,9 @@ func main() {
 		ctx.JSON(200, gin.H{"message": "ok 5"})
 	})
 
+	// migrations
+	db.AddUUIDExtension()
+
 	if err := db.DB.AutoMigrate(
 		models.Category{},
 		models.Post{},
@@ -39,6 +43,8 @@ func main() {
 	crudGroup := server.Group("crud")
 
 	crud.RegisterRoutes(crudGroup)
+
+	seed.SeedPosts()
 
 	err := server.Run()
 	if err != nil {

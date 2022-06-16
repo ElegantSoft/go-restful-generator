@@ -22,5 +22,5 @@ var filterConditions = map[string]string{
 	"$lt":   "<",
 	"$gte":  ">=",
 	"$lte":  "<=",
-	"$cont": "LIKE",
+	"$cont": "ILIKE",
 }

@@ -1,19 +1,25 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Post struct {
-	gorm.Model
-	ID          uint     `json:"id"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	CategoryID  uint     `json:"category_id"`
-	Category    Category `json:"category"`
-	Price       uint32   `json:"price"`
+	ID          uuid.UUID `json:"id" gorm:"type:uuid; default:uuid_generate_v4()"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	CategoryID  uuid.UUID `json:"category_id"`
+	Category    Category  `json:"category"`
+	Price       uint32    `json:"price"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Category struct {
-	gorm.Model
-	Name  string `json:"name,omitempty"`
-	Posts []Post `json:"posts,omitempty"`
+	ID        uuid.UUID `json:"id" gorm:"type:uuid; default:uuid_generate_v4()"`
+	Name      string    `json:"name,omitempty"`
+	Posts     []Post    `json:"posts,omitempty"`
+	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
 }

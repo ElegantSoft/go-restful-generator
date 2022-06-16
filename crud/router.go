@@ -5,8 +5,8 @@ import (
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"log"
+	"math"
 	"strings"
 )
 
@@ -31,19 +31,31 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 			}
 		}
 
-		txString := db.DB.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			var result []models.Post
-
-			err, transaction := searchToQuery(s, tx.Model(&models.Post{}))
-			if err != nil {
-				log.Printf("err -> %+v", err)
-			}
-			return transaction.Scan(&result)
-		})
-		log.Printf("tx -> %+v", txString)
+		var result []models.Post
+		tx := db.DB.Model(models.Post{})
+		if api.Page > 0 {
+			tx.Limit(int(api.Limit)).Offset(int((api.Page - 1) * api.Limit))
+		}
+		err, transaction := searchToQuery(s, tx.Model(&models.Post{}))
+		if err != nil {
+			log.Printf("err -> %+v", err)
+		}
+		transaction.Scan(&result)
 
 		log.Printf("api params -> %+v", api)
 		log.Printf("search is -> %+v", s)
-		ctx.JSON(200, gin.H{"data": api})
+		var data interface{}
+		var totalRows int64
+		db.DB.Model(&models.Post{}).Count(&totalRows)
+		if api.Page > 0 {
+			data = map[string]interface{}{
+				"data":       result,
+				"total":      totalRows,
+				"totalPages": int(math.Ceil(float64(totalRows) / float64(api.Limit))),
+			}
+		} else {
+			data = result
+		}
+		ctx.JSON(200, gin.H{"api": api, "data": data})
 	})
 }
