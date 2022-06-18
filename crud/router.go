@@ -6,38 +6,40 @@ import (
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
 	"github.com/gin-gonic/gin"
+	"math"
 	"net/http"
 )
 
 func RegisterRoutes(routerGroup *gin.RouterGroup) {
+	repo := NewRepository[models.Post](db.DB, &models.Post{})
+	s := NewService[models.Post](repo)
+
 	routerGroup.GET("", func(ctx *gin.Context) {
 		var api GetAllRequest
 		if err := ctx.ShouldBindQuery(&api); err != nil {
 			ctx.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-		var s = NewRepository[models.Post](db.DB, &models.Post{})
 
 		var result []models.Post
-		err := s.Find(api, &result)
+		var totalRows int64
+		err := s.Find(api, &result, &totalRows)
 		if err != nil {
 			ctx.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
 
-		//var data interface{}
-		//var totalRows int64
-		//tx.Count(&totalRows)
-		//if api.Page > 0 {
-		//	data = map[string]interface{}{
-		//		//"data":       result,
-		//		//"total":      totalRows,
-		//		//"totalPages": int(math.Ceil(float64(totalRows) / float64(api.Limit))),
-		//	}
-		//} else {
-		//	//data = result
-		//}
-		ctx.JSON(200, gin.H{"data": result})
+		var data interface{}
+		if api.Page > 0 {
+			data = map[string]interface{}{
+				"data":       result,
+				"total":      totalRows,
+				"totalPages": int(math.Ceil(float64(totalRows) / float64(api.Limit))),
+			}
+		} else {
+			data = result
+		}
+		ctx.JSON(200, data)
 	})
 
 	routerGroup.GET(":id", func(ctx *gin.Context) {
@@ -51,7 +53,6 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": common.ValidateErrors(err)})
 			return
 		}
-		var s = NewRepository[models.Post](db.DB, &models.Post{})
 
 		api.Filter = append(api.Filter, fmt.Sprintf("id||$eq||%s", item.ID))
 
@@ -62,19 +63,6 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 			ctx.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-
-		//var data interface{}
-		//var totalRows int64
-		//tx.Count(&totalRows)
-		//if api.Page > 0 {
-		//	data = map[string]interface{}{
-		//		//"data":       result,
-		//		//"total":      totalRows,
-		//		//"totalPages": int(math.Ceil(float64(totalRows) / float64(api.Limit))),
-		//	}
-		//} else {
-		//	//data = result
-		//}
 		ctx.JSON(200, result)
 	})
 }
