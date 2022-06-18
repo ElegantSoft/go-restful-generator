@@ -6,15 +6,17 @@ import (
 	"github.com/ElegantSoft/go-crud-starter/db/models"
 )
 
+type model = models.Post
+
 type Repository struct {
-	crud.Repository[models.Post]
+	crud.Repository[model]
 }
 
 func InitRepository() *Repository {
 	return &Repository{
-		Repository: crud.Repository[models.Post]{
+		Repository: crud.Repository[model]{
 			DB:    db.DB,
-			Model: &models.Post{},
+			Model: &model{},
 		},
 	}
 }

@@ -79,6 +79,10 @@ func (svc *Service[T]) Delete(cond *T) error {
 	return svc.Repo.Delete(cond)
 }
 
+func (svc *Service[T]) Update(cond *T, updatedColumns interface{}) error {
+	return svc.Repo.Update(cond, updatedColumns)
+}
+
 func NewService[T any](repo Repo[T]) *Service[T] {
 	return &Service[T]{
 		Repo: repo,

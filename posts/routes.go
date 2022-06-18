@@ -3,9 +3,8 @@ package posts
 import "github.com/gin-gonic/gin"
 
 func RegisterRoutes(routerGroup *gin.RouterGroup) {
-	repository := *InitRepository()
-	service := *NewService(&repository)
-	controller := *NewController(&service)
+	service := InitService()
+	controller := NewController(service)
 
 	routerGroup.GET("", controller.findAll)
 	routerGroup.GET(":id", controller.findOne)

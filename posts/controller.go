@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/ElegantSoft/go-crud-starter/common"
 	"github.com/ElegantSoft/go-crud-starter/crud"
-	"github.com/ElegantSoft/go-crud-starter/db/models"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"math"
 	"net/http"
 )
@@ -13,8 +13,6 @@ import (
 type Controller struct {
 	service *Service
 }
-
-type model = models.Post
 
 func (c *Controller) findAll(ctx *gin.Context) {
 	var api crud.GetAllRequest
@@ -71,53 +69,62 @@ func (c *Controller) findOne(ctx *gin.Context) {
 	ctx.JSON(200, result)
 }
 
-//func (s *Controller) Create(ctx *gin.Context) {
-//	var item Interest
-//	if err := ctx.ShouldBind(&item); err != nil {
-//		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-//		return
-//	}
-//	err, found := s.service.Create(&item)
-//	if err != nil {
-//		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-//		return
-//	}
-//	ctx.JSON(http.StatusOK, gin.H{"data": &found})
-//}
-//
-//func (s *Controller) Delete(ctx *gin.Context) {
-//	var item ById
-//	if err := ctx.ShouldBindUri(&item); err != nil {
-//		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-//		return
-//	}
-//	err := s.service.Delete(item.ID)
-//	if err != nil {
-//		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-//		return
-//	}
-//	ctx.JSON(http.StatusOK, gin.H{"message": "deleted"})
-//}
-//
-//func (s *Controller) Update(ctx *gin.Context) {
-//	var item Interest
-//	var byId ById
-//	if err := ctx.ShouldBind(&item); err != nil {
-//		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-//		return
-//	}
-//	if err := ctx.ShouldBindUri(&byId); err != nil {
-//		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-//		return
-//	}
-//	err := s.service.Update(&item, byId.ID)
-//	if err != nil {
-//		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-//		return
-//	}
-//	ctx.JSON(http.StatusOK, gin.H{"message": "updated"})
-//}
-//
+func (s *Controller) Create(ctx *gin.Context) {
+	var item model
+	if err := ctx.ShouldBind(&item); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := s.service.Create(&item)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"data": item})
+}
+
+func (s *Controller) Delete(ctx *gin.Context) {
+	var item common.ById
+	if err := ctx.ShouldBindUri(&item); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	id, err := uuid.FromBytes([]byte(item.ID))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = s.service.Delete(&model{ID: id})
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "deleted"})
+}
+
+func (s *Controller) Update(ctx *gin.Context) {
+	var item model
+	var byId common.ById
+	if err := ctx.ShouldBind(&item); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	id, err := uuid.FromBytes([]byte(byId.ID))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := ctx.ShouldBindUri(&byId); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = s.service.Update(&model{ID: id}, &item)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "updated"})
+}
 
 func NewController(service *Service) *Controller {
 	return &Controller{
