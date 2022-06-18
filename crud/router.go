@@ -1,72 +1,80 @@
 package crud
 
 import (
-	"encoding/json"
+	"fmt"
+	"github.com/ElegantSoft/go-crud-starter/common"
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
 	"github.com/gin-gonic/gin"
-	"log"
-	"math"
-	"strings"
+	"net/http"
 )
-
-var qtb = &queryToDBConverter{}
 
 func RegisterRoutes(routerGroup *gin.RouterGroup) {
 	routerGroup.GET("", func(ctx *gin.Context) {
-		var api GetAll
-		var s map[string]interface{}
-
+		var api GetAllRequest
 		if err := ctx.ShouldBindQuery(&api); err != nil {
 			ctx.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-
-		if len(api.S) > 0 {
-			err := json.Unmarshal([]byte(api.S), &s)
-			if err != nil {
-				log.Printf("error while convert search %v", err)
-			}
-		}
+		var s = NewRepository[models.Post](db.DB, &models.Post{})
 
 		var result []models.Post
-		tx := db.DB.Model(models.Post{})
-
-		if len(api.Fields) > 0 {
-			fields := strings.Split(api.Fields, ",")
-			tx.Select(fields)
-		}
-		if len(api.Join) > 0 {
-			qtb.relationsMapper(api.Join, tx)
-		}
-		if api.Page > 0 {
-			tx.Limit(int(api.Limit)).Offset(int((api.Page - 1) * api.Limit))
-		}
-
-		if len(api.Filter) > 0 {
-			qtb.filterMapper(api.Filter, tx)
-		}
-
-		err := qtb.searchMapper(s, tx)
+		err := s.Find(api, &result)
 		if err != nil {
-			log.Printf("err -> %+v", err)
+			ctx.JSON(400, gin.H{"error": err.Error()})
+			return
 		}
-		tx.Find(&result)
 
-		log.Printf("api params -> %+v", api)
-		log.Printf("search is -> %+v", s)
-		var data interface{}
-		var totalRows int64
-		tx.Count(&totalRows)
-		if api.Page > 0 {
-			data = map[string]interface{}{
-				"data":       result,
-				"total":      totalRows,
-				"totalPages": int(math.Ceil(float64(totalRows) / float64(api.Limit))),
-			}
-		} else {
-			data = result
+		//var data interface{}
+		//var totalRows int64
+		//tx.Count(&totalRows)
+		//if api.Page > 0 {
+		//	data = map[string]interface{}{
+		//		//"data":       result,
+		//		//"total":      totalRows,
+		//		//"totalPages": int(math.Ceil(float64(totalRows) / float64(api.Limit))),
+		//	}
+		//} else {
+		//	//data = result
+		//}
+		ctx.JSON(200, gin.H{"data": result})
+	})
+
+	routerGroup.GET(":id", func(ctx *gin.Context) {
+		var api GetAllRequest
+		var item ById
+		if err := ctx.ShouldBindQuery(&api); err != nil {
+			ctx.JSON(400, gin.H{"error": err.Error()})
+			return
 		}
-		ctx.JSON(200, gin.H{"api": api, "data": data})
+		if err := ctx.ShouldBindUri(&item); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": common.ValidateErrors(err)})
+			return
+		}
+		var s = NewRepository[models.Post](db.DB, &models.Post{})
+
+		api.Filter = append(api.Filter, fmt.Sprintf("id||$eq||%s", item.ID))
+
+		var result models.Post
+
+		err := s.FindOne(api, &result)
+		if err != nil {
+			ctx.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		//var data interface{}
+		//var totalRows int64
+		//tx.Count(&totalRows)
+		//if api.Page > 0 {
+		//	data = map[string]interface{}{
+		//		//"data":       result,
+		//		//"total":      totalRows,
+		//		//"totalPages": int(math.Ceil(float64(totalRows) / float64(api.Limit))),
+		//	}
+		//} else {
+		//	//data = result
+		//}
+		ctx.JSON(200, result)
 	})
 }

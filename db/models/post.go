@@ -18,8 +18,8 @@ type Post struct {
 
 type Category struct {
 	ID        uuid.UUID `json:"id,omitempty" gorm:"type:uuid; default:uuid_generate_v4()"`
-	Name      string    `json:"name,omitempty,omitempty"`
-	Posts     []Post    `json:"posts,omitempty,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	Posts     []Post    `json:"posts,omitempty"`
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }

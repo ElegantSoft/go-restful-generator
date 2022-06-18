@@ -1,12 +1,13 @@
 package crud
 
 const (
-	AND       = "$and"
-	OR        = "$or"
-	SEPARATOR = "||"
+	AND           = "$and"
+	OR            = "$or"
+	SEPARATOR     = "||"
+	SortSeparator = ","
 )
 
-type GetAll struct {
+type GetAllRequest struct {
 	Page   uint     `json:"page" form:"page"`
 	Limit  uint     `json:"limit" form:"limit"`
 	Join   string   `json:"join" form:"join"`
@@ -26,19 +27,6 @@ var filterConditions = map[string]string{
 	"$cont": "ILIKE",
 }
 
-//type Crud[T any] interface {
-//	FindAllBase(str T) T
-//}
-//
-//type crudImpl[T any] struct {
-//}
-//
-//func (c crudImpl[T]) FindAllBase(str T) T {
-//	//TODO implement me
-//	panic("implement me")
-//	return str
-//}
-//
-//func InitCrud[T any]() Crud[T] {
-//	return crudImpl[T]{}
-//}
+type ById struct {
+	ID string `uri:"id" binding:"required"`
+}

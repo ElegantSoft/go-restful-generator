@@ -111,3 +111,14 @@ func (q *queryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 		}
 	}
 }
+
+func (q *queryToDBConverter) sortMapper(sorts []string, tx *gorm.DB) {
+	for _, sort := range sorts {
+		sortParams := strings.Split(sort, SortSeparator)
+		if len(sortParams) == 2 {
+			tx.Order(fmt.Sprintf("%s %s", sortParams[0], strings.ToLower(sortParams[1])))
+		} else {
+			tx.Order(fmt.Sprintf("%s desc", sortParams[0]))
+		}
+	}
+}
