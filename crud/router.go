@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+var qtb = &queryToDBConverter{}
+
 func RegisterRoutes(routerGroup *gin.RouterGroup) {
 	routerGroup.GET("", func(ctx *gin.Context) {
 		var api GetAll
@@ -35,12 +37,17 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 			tx.Select(fields)
 		}
 		if len(api.Join) > 0 {
-			relationsMapper(api.Join, tx)
+			qtb.relationsMapper(api.Join, tx)
 		}
 		if api.Page > 0 {
 			tx.Limit(int(api.Limit)).Offset(int((api.Page - 1) * api.Limit))
 		}
-		err := searchMapper(s, tx)
+
+		if len(api.Filter) > 0 {
+			qtb.filterMapper(api.Filter, tx)
+		}
+
+		err := qtb.searchMapper(s, tx)
 		if err != nil {
 			log.Printf("err -> %+v", err)
 		}

@@ -12,6 +12,7 @@ type GetAll struct {
 	Join   string   `json:"join" form:"join"`
 	S      string   `json:"s" form:"s"`
 	Fields string   `json:"fields" form:"fields"`
+	Filter []string `json:"filter" form:"filter"`
 	Sort   []string `json:"sort" form:"sort"`
 }
 
@@ -24,3 +25,20 @@ var filterConditions = map[string]string{
 	"$lte":  "<=",
 	"$cont": "ILIKE",
 }
+
+//type Crud[T any] interface {
+//	FindAllBase(str T) T
+//}
+//
+//type crudImpl[T any] struct {
+//}
+//
+//func (c crudImpl[T]) FindAllBase(str T) T {
+//	//TODO implement me
+//	panic("implement me")
+//	return str
+//}
+//
+//func InitCrud[T any]() Crud[T] {
+//	return crudImpl[T]{}
+//}
