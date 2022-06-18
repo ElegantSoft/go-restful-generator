@@ -11,10 +11,10 @@ import (
 
 var AndValueNotSlice = errors.New("the value of $and or $or not array")
 
-type queryToDBConverter struct {
+type QueryToDBConverter struct {
 }
 
-func (q *queryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB) error {
+func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB) error {
 	for k := range s {
 		if k == AND {
 			vals, ok := s[k].([]interface{})
@@ -88,14 +88,14 @@ func (q *queryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 	return nil
 }
 
-func (q *queryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
+func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
 	relations := strings.Split(joinString, ",")
 	for _, relation := range relations {
 		tx.Preload(strcase.ToCamel(relation))
 	}
 }
 
-func (q *queryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
+func (q *QueryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 	for _, filter := range filters {
 		filterParams := strings.Split(filter, SEPARATOR)
 		if len(filterParams) == 3 {
@@ -112,7 +112,7 @@ func (q *queryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 	}
 }
 
-func (q *queryToDBConverter) sortMapper(sorts []string, tx *gorm.DB) {
+func (q *QueryToDBConverter) sortMapper(sorts []string, tx *gorm.DB) {
 	for _, sort := range sorts {
 		sortParams := strings.Split(sort, SortSeparator)
 		if len(sortParams) == 2 {

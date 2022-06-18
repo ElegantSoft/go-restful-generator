@@ -4,6 +4,7 @@ import (
 	"github.com/ElegantSoft/go-crud-starter/crud"
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
+	"github.com/ElegantSoft/go-crud-starter/posts"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
@@ -40,8 +41,10 @@ func main() {
 	}
 
 	crudGroup := server.Group("crud")
+	postsGroup := server.Group("posts")
 
 	crud.RegisterRoutes(crudGroup)
+	posts.RegisterRoutes(postsGroup)
 
 	//seed.SeedPosts()
 

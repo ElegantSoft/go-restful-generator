@@ -5,35 +5,35 @@ import (
 )
 
 type Service[T any] struct {
-	repo *Repository[T]
-	qtb  *queryToDBConverter
+	Repo Repo[T]
+	Qtb  *QueryToDBConverter
 }
 
 func (svc *Service[T]) Find(api GetAllRequest, result *[]T, totalRows *int64) error {
 	var s map[string]interface{}
 
-	tx := svc.repo.getTx()
+	tx := svc.Repo.getTx()
 
 	if len(api.Fields) > 0 {
 		fields := strings.Split(api.Fields, ",")
 		tx.Select(fields)
 	}
 	if len(api.Join) > 0 {
-		svc.qtb.relationsMapper(api.Join, tx)
+		svc.Qtb.relationsMapper(api.Join, tx)
 	}
 	if api.Page > 0 {
 		tx.Limit(int(api.Limit)).Offset(int((api.Page - 1) * api.Limit))
 	}
 
 	if len(api.Filter) > 0 {
-		svc.qtb.filterMapper(api.Filter, tx)
+		svc.Qtb.filterMapper(api.Filter, tx)
 	}
 
 	if len(api.Sort) > 0 {
-		svc.qtb.sortMapper(api.Sort, tx)
+		svc.Qtb.sortMapper(api.Sort, tx)
 	}
 
-	err := svc.qtb.searchMapper(s, tx)
+	err := svc.Qtb.searchMapper(s, tx)
 	if err != nil {
 		return err
 	}
@@ -45,25 +45,25 @@ func (svc *Service[T]) Find(api GetAllRequest, result *[]T, totalRows *int64) er
 func (svc *Service[T]) FindOne(api GetAllRequest, result *T) error {
 	var s map[string]interface{}
 
-	tx := svc.repo.getTx()
+	tx := svc.Repo.getTx()
 
 	if len(api.Fields) > 0 {
 		fields := strings.Split(api.Fields, ",")
 		tx.Select(fields)
 	}
 	if len(api.Join) > 0 {
-		svc.qtb.relationsMapper(api.Join, tx)
+		svc.Qtb.relationsMapper(api.Join, tx)
 	}
 
 	if len(api.Filter) > 0 {
-		svc.qtb.filterMapper(api.Filter, tx)
+		svc.Qtb.filterMapper(api.Filter, tx)
 	}
 
 	if len(api.Sort) > 0 {
-		svc.qtb.sortMapper(api.Sort, tx)
+		svc.Qtb.sortMapper(api.Sort, tx)
 	}
 
-	err := svc.qtb.searchMapper(s, tx)
+	err := svc.Qtb.searchMapper(s, tx)
 	if err != nil {
 		return err
 	}
@@ -72,16 +72,16 @@ func (svc *Service[T]) FindOne(api GetAllRequest, result *T) error {
 }
 
 func (svc *Service[T]) Create(data *T) error {
-	return svc.repo.Create(data)
+	return svc.Repo.Create(data)
 }
 
 func (svc *Service[T]) Delete(cond *T) error {
-	return svc.repo.Delete(cond)
+	return svc.Repo.Delete(cond)
 }
 
-func NewService[T any](repo *Repository[T]) *Service[T] {
+func NewService[T any](repo Repo[T]) *Service[T] {
 	return &Service[T]{
-		repo: repo,
-		qtb:  &queryToDBConverter{},
+		Repo: repo,
+		Qtb:  &QueryToDBConverter{},
 	}
 }
