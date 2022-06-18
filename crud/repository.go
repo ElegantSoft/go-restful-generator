@@ -23,7 +23,7 @@ func (r *Repository[T]) FindOne(cond *T, dest *T) error {
 }
 
 func (r *Repository[T]) Update(cond *T, updatedColumns interface{}) error {
-	return r.DB.Model(r.Model).Select("*").Where(cond).UpdateColumns(updatedColumns).Error
+	return r.DB.Model(r.Model).Where(cond).UpdateColumns(updatedColumns).Error
 }
 
 func (r *Repository[T]) Delete(cond *T) error {

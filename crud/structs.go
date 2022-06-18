@@ -8,8 +8,8 @@ const (
 )
 
 type GetAllRequest struct {
-	Page   uint     `json:"page" form:"page"`
-	Limit  uint     `json:"limit" form:"limit"`
+	Page   int      `json:"page" form:"page"`
+	Limit  int      `json:"limit" form:"limit"`
 	Join   string   `json:"join" form:"join"`
 	S      string   `json:"s" form:"s"`
 	Fields string   `json:"fields" form:"fields"`

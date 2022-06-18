@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"encoding/json"
 	"strings"
 )
 
@@ -11,9 +12,15 @@ type Service[T any] struct {
 
 func (svc *Service[T]) Find(api GetAllRequest, result *[]T, totalRows *int64) error {
 	var s map[string]interface{}
+	if len(api.S) > 0 {
+		err := json.Unmarshal([]byte(api.S), &s)
+		if err != nil {
+			return err
+		}
+	}
 
 	tx := svc.Repo.getTx()
-
+	tx.Limit(api.Limit)
 	if len(api.Fields) > 0 {
 		fields := strings.Split(api.Fields, ",")
 		tx.Select(fields)
@@ -22,7 +29,7 @@ func (svc *Service[T]) Find(api GetAllRequest, result *[]T, totalRows *int64) er
 		svc.Qtb.relationsMapper(api.Join, tx)
 	}
 	if api.Page > 0 {
-		tx.Limit(int(api.Limit)).Offset(int((api.Page - 1) * api.Limit))
+		tx.Offset((api.Page - 1) * api.Limit)
 	}
 
 	if len(api.Filter) > 0 {
@@ -38,12 +45,17 @@ func (svc *Service[T]) Find(api GetAllRequest, result *[]T, totalRows *int64) er
 		return err
 	}
 	tx.Count(totalRows)
-	tx.Find(&result)
-	return nil
+	return tx.Find(&result).Error
 }
 
 func (svc *Service[T]) FindOne(api GetAllRequest, result *T) error {
 	var s map[string]interface{}
+	if len(api.S) > 0 {
+		err := json.Unmarshal([]byte(api.S), &s)
+		if err != nil {
+			return err
+		}
+	}
 
 	tx := svc.Repo.getTx()
 
@@ -67,8 +79,7 @@ func (svc *Service[T]) FindOne(api GetAllRequest, result *T) error {
 	if err != nil {
 		return err
 	}
-	tx.First(&result)
-	return nil
+	return tx.First(&result).Error
 }
 
 func (svc *Service[T]) Create(data *T) error {

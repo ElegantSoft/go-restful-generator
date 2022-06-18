@@ -8,7 +8,7 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 
 	routerGroup.GET("", controller.findAll)
 	routerGroup.GET(":id", controller.findOne)
-	//routerGroup.POST( "/", controller.Create)
-	//routerGroup.DELETE( "/:id", controller.Delete)
-	//routerGroup.PUT( "/:id", controller.Update)
+	routerGroup.POST("", controller.create)
+	routerGroup.DELETE(":id", controller.delete)
+	routerGroup.PUT(":id", controller.update)
 }

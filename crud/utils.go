@@ -15,6 +15,7 @@ type QueryToDBConverter struct {
 }
 
 func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB) error {
+	log.Printf("search is -> %+v", s)
 	for k := range s {
 		if k == AND {
 			vals, ok := s[k].([]interface{})

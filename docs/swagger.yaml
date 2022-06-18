@@ -1,0 +1,172 @@
+definitions:
+  models.Category:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      posts:
+        items:
+          $ref: '#/definitions/models.Post'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  models.Post:
+    properties:
+      category:
+        $ref: '#/definitions/models.Category'
+      category_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      price:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  posts.model:
+    properties:
+      category:
+        $ref: '#/definitions/models.Category'
+      category_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      price:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  /posts:
+    get:
+      parameters:
+      - description: '{''$and'': [ {''title'': { ''$cont'':''cul'' } } ]}'
+        in: query
+        name: s
+        type: string
+      - description: 'fields to select eg: name,age'
+        in: query
+        name: fields
+        type: string
+      - description: page of pagination
+        in: query
+        name: page
+        type: integer
+      - description: limit of pagination
+        in: query
+        name: limit
+        type: integer
+      - description: 'join relations eg: category, parent'
+        in: query
+        name: join
+        type: string
+      - description: 'filters eg: name||$eq||ad price||$gte||200'
+        in: query
+        items:
+          type: string
+        name: filter
+        type: array
+      - description: 'filters eg: created_at,desc title,asc'
+        in: query
+        items:
+          type: string
+        name: sort
+        type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/posts.model'
+            type: array
+      tags:
+      - posts
+    post:
+      parameters:
+      - description: item to create
+        in: body
+        name: '{object}'
+        required: true
+        schema:
+          $ref: '#/definitions/posts.model'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/posts.model'
+      tags:
+      - posts
+  /posts/{id}:
+    delete:
+      parameters:
+      - description: uuid of item
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      tags:
+      - posts
+    get:
+      parameters:
+      - description: uuid of item
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/posts.model'
+      tags:
+      - posts
+    put:
+      parameters:
+      - description: uuid of item
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: update body
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/posts.model'
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      tags:
+      - posts
+swagger: "2.0"

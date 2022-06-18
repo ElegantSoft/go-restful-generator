@@ -4,13 +4,22 @@ import (
 	"github.com/ElegantSoft/go-crud-starter/crud"
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
+	_ "github.com/ElegantSoft/go-crud-starter/docs"
 	"github.com/ElegantSoft/go-crud-starter/posts"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"os"
 )
 
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
@@ -45,6 +54,8 @@ func main() {
 
 	crud.RegisterRoutes(crudGroup)
 	posts.RegisterRoutes(postsGroup)
+
+	server.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	//seed.SeedPosts()
 

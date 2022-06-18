@@ -1,6 +1,6 @@
 
 
-GET http://localhost:8080/posts?page=1&join=category&fields=title,id,category_id&filter=title||$cont||haru&sort=title&sort=id,asc
+GET http://localhost:8080/posts?page=1&s={"$and":[{"title": {"$cont": "cul"}}]}
 
 ### get one
 GET http://localhost:8080/posts/11c457ed-4fc4-4d65-b106-1b2732869ae2
