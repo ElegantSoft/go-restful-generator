@@ -9,6 +9,12 @@ import (
 	"strings"
 )
 
+const (
+	ContainOperator = "$cont"
+	NotNullOperator = "$notnull"
+	IsNullOperator  = "$isnull"
+)
+
 var AndValueNotSlice = errors.New("the value of $and or $or not array")
 
 type QueryToDBConverter struct {
@@ -31,11 +37,16 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 							for operatorKey, value := range whereValMap {
 								operator, ok := filterConditions[operatorKey]
 								if ok {
-									if operatorKey == "$cont" {
-										value = fmt.Sprintf("%%%s%%", value)
-										log.Println(value)
+									if operatorKey == NotNullOperator || operatorKey == IsNullOperator {
+										tx.Where(fmt.Sprintf("%s %s", whereField, operator))
+									} else {
+
+										if operatorKey == ContainOperator {
+											value = fmt.Sprintf("%%%s%%", value)
+											log.Println(value)
+										}
+										tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
 									}
-									tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
 								}
 							}
 
@@ -60,14 +71,22 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 							for operatorKey, value := range whereValMap {
 								operator, ok := filterConditions[operatorKey]
 								if ok {
-									if operatorKey == "$cont" {
-										value = fmt.Sprintf("%%%s%%", value)
-										log.Println(value)
-									}
-									if i == 0 {
-										tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
+									if operatorKey == NotNullOperator || operatorKey == IsNullOperator {
+										if i == 0 {
+											tx.Where(fmt.Sprintf("%s %s", whereField, operator))
+										} else {
+											tx.Or(fmt.Sprintf("%s %s", whereField, operator))
+										}
 									} else {
-										tx.Or(fmt.Sprintf("%s %s ?", whereField, operator), value)
+										if operatorKey == ContainOperator {
+											value = fmt.Sprintf("%%%s%%", value)
+											log.Println(value)
+										}
+										if i == 0 {
+											tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
+										} else {
+											tx.Or(fmt.Sprintf("%s %s ?", whereField, operator), value)
+										}
 									}
 								}
 							}
@@ -102,11 +121,15 @@ func (q *QueryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 		if len(filterParams) == 3 {
 			operator, ok := filterConditions[filterParams[1]]
 			if ok {
-				if filterParams[1] == "$cont" {
-					tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), fmt.Sprintf("%%%s%%", filterParams[2]))
+				if filterParams[1] == NotNullOperator || filterParams[1] == IsNullOperator {
+					tx.Where(fmt.Sprintf("%s %s", filterParams[0], operator))
 				} else {
-					tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), filterParams[2])
+					if filterParams[1] == ContainOperator {
+						tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), fmt.Sprintf("%%%s%%", filterParams[2]))
+					} else {
+						tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), filterParams[2])
 
+					}
 				}
 			}
 		}
