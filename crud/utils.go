@@ -118,17 +118,20 @@ func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
 func (q *QueryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 	for _, filter := range filters {
 		filterParams := strings.Split(filter, SEPARATOR)
-		if len(filterParams) == 3 {
+		if len(filterParams) == 2 {
 			operator, ok := filterConditions[filterParams[1]]
 			if ok {
 				if filterParams[1] == NotNullOperator || filterParams[1] == IsNullOperator {
 					tx.Where(fmt.Sprintf("%s %s", filterParams[0], operator))
 				} else {
-					if filterParams[1] == ContainOperator {
-						tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), fmt.Sprintf("%%%s%%", filterParams[2]))
-					} else {
-						tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), filterParams[2])
+					if len(filterParams) == 3 {
 
+						if filterParams[1] == ContainOperator {
+							tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), fmt.Sprintf("%%%s%%", filterParams[2]))
+						} else {
+							tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), filterParams[2])
+
+						}
 					}
 				}
 			}
