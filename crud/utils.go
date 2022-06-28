@@ -118,7 +118,7 @@ func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
 func (q *QueryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 	for _, filter := range filters {
 		filterParams := strings.Split(filter, SEPARATOR)
-		if len(filterParams) > 2 {
+		if len(filterParams) >= 2 {
 			operator, ok := filterConditions[filterParams[1]]
 			if ok {
 				if filterParams[1] == NotNullOperator || filterParams[1] == IsNullOperator {
