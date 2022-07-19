@@ -30,6 +30,14 @@ Fell free to make PR to add other frameworks or ORMs
 
 `cd $your-project-name && rm -R .git`
 
+### Configuration
+- Create `.env` file for configuration.
+- Add to it `DB_URL` as a connection string which is in used by [Gorm](https://gorm.io/docs/connecting_to_the_database.html)
+- By default `PORT` is configured on 8080, but you can specify in the `.env` file a different `PORT` if you like so.
+- If you want to have the documentation also updated then follow the next steps:
+  - Install `swaggo` with `go install github.com/swaggo/swag/cmd/swag@latest`
+  - Run in terminal `swag init` which will update the swagger files in the `docs` directory.
+
 ### See examples as posts then duplicate it
 
 First you can see how crud api works by running project and go to `/docs/index.html`
