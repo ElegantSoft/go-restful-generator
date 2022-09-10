@@ -1,7 +1,7 @@
 package posts
 
 import (
-	"github.com/ElegantSoft/go-crud-starter/crud"
+	"github.com/ElegantSoft/go-crud-starter/server/crud"
 )
 
 type Service struct {

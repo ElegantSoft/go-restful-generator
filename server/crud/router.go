@@ -2,12 +2,13 @@ package crud
 
 import (
 	"fmt"
-	"github.com/ElegantSoft/go-crud-starter/common"
-	"github.com/ElegantSoft/go-crud-starter/db"
-	"github.com/ElegantSoft/go-crud-starter/db/models"
-	"github.com/gin-gonic/gin"
 	"math"
 	"net/http"
+
+	"github.com/ElegantSoft/go-crud-starter/server/common"
+	"github.com/ElegantSoft/go-crud-starter/server/db"
+	"github.com/ElegantSoft/go-crud-starter/server/db/models"
+	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(routerGroup *gin.RouterGroup) {
