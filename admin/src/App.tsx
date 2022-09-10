@@ -1,33 +1,28 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { Admin, fetchUtils, Resource } from 'react-admin'
+import { apiProvider } from './config/api.provider'
+import { API_URL } from './config/constants'
+import { postsResource } from './resources/posts/resource'
+
+const httpClient = (url: string, options: any = {}) => {
+  if (!options.headers) {
+    options.headers = new Headers({ Accept: "application/json" })
+  }
+  const token = localStorage.getItem("token")
+  options.headers.set("Authorization", `Bearer ${token}`)
+  return fetchUtils.fetchJson(url, options)
+}
+
+const dataProvider = apiProvider(API_URL, httpClient)
 
 function App() {
   const [count, setCount] = useState(0)
 
+
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <Admin dataProvider={dataProvider}>
+      <Resource name="posts" {...postsResource} />
+    </Admin>
   )
 }
 
