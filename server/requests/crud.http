@@ -1,0 +1,9 @@
+
+
+GET http://localhost:8080/crud?join=category&fields=title,id,category_id&filter=title||$cont||haru&filter=id||$eq||11c457ed-4fc4-4d65-b106-1b2732869ae2&sort=title&sort=id,asc
+
+### get one
+GET http://localhost:8080/crud/11c457ed-4fc4-4d65-b106-1b2732869ae2?join=category
+
+
+#{"title": {"$cont": "hAru"}}
