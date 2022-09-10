@@ -1,17 +1,19 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/ElegantSoft/go-crud-starter/crud"
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
 	_ "github.com/ElegantSoft/go-crud-starter/docs"
 	"github.com/ElegantSoft/go-crud-starter/posts"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"log"
-	"os"
 )
 
 // @contact.name   API Support
@@ -26,6 +28,14 @@ func main() {
 	}
 	server := gin.New()
 	server.Use(gin.Recovery())
+
+	config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{"http://localhost:5173"}
+	config.AllowAllOrigins = true
+	config.AddAllowHeaders("Authorization")
+
+	server.Use(cors.New(config))
+
 	if os.Getenv("GIN_MODE") == "debug" {
 		server.Use(gin.Logger())
 	}
@@ -57,7 +67,7 @@ func main() {
 
 	server.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	//seed.SeedPosts()
+	// seed.SeedPosts()
 
 	err := server.Run()
 	if err != nil {

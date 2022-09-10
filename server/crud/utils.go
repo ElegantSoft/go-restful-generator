@@ -3,16 +3,17 @@ package crud
 import (
 	"errors"
 	"fmt"
-	"github.com/iancoleman/strcase"
-	"gorm.io/gorm"
 	"log"
 	"strings"
+
+	"github.com/iancoleman/strcase"
+	"gorm.io/gorm"
 )
 
 const (
-	ContainOperator = "$cont"
-	NotNullOperator = "$notnull"
-	IsNullOperator  = "$isnull"
+	ContainOperator = "cont"
+	NotNullOperator = "notnull"
+	IsNullOperator  = "isnull"
 )
 
 var AndValueNotSlice = errors.New("the value of $and or $or not array")
@@ -111,7 +112,9 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
 	relations := strings.Split(joinString, ",")
 	for _, relation := range relations {
-		tx.Preload(strcase.ToCamel(relation))
+		if len(relation) > 0 {
+			tx.Preload(strcase.ToCamel(relation))
+		}
 	}
 }
 

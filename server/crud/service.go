@@ -2,6 +2,7 @@ package crud
 
 import (
 	"encoding/json"
+	"log"
 	"strings"
 )
 
@@ -18,9 +19,9 @@ func (svc *Service[T]) Find(api GetAllRequest, result *[]T, totalRows *int64) er
 			return err
 		}
 	}
+	log.Printf("page -> %v limit %v", api.Page, api.Limit)
 
 	tx := svc.Repo.getTx()
-	tx.Limit(api.Limit)
 	if len(api.Fields) > 0 {
 		fields := strings.Split(api.Fields, ",")
 		tx.Select(fields)
@@ -28,10 +29,8 @@ func (svc *Service[T]) Find(api GetAllRequest, result *[]T, totalRows *int64) er
 	if len(api.Join) > 0 {
 		svc.Qtb.relationsMapper(api.Join, tx)
 	}
-	if api.Page > 0 {
-		tx.Offset((api.Page - 1) * api.Limit)
-	}
 
+	log.Printf("Filter: %v", api.Filter)
 	if len(api.Filter) > 0 {
 		svc.Qtb.filterMapper(api.Filter, tx)
 	}
@@ -45,6 +44,12 @@ func (svc *Service[T]) Find(api GetAllRequest, result *[]T, totalRows *int64) er
 		return err
 	}
 	tx.Count(totalRows)
+
+	tx.Limit(api.Limit)
+
+	if api.Page > 0 {
+		tx.Offset((api.Page - 1) * api.Limit)
+	}
 	return tx.Find(&result).Error
 }
 

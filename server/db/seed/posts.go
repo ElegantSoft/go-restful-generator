@@ -1,10 +1,12 @@
 package seed
 
 import (
+	"log"
+
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
 	"github.com/bxcodec/faker/v3"
-	"log"
+	"github.com/google/uuid"
 )
 
 func SeedPosts() {
@@ -21,8 +23,11 @@ func SeedPosts() {
 			post := models.Post{
 				Title:       faker.Word(),
 				Description: faker.Paragraph(),
-				CategoryID:  cat.ID,
-				Price:       uint32(l + 1*i + 1),
+				CategoryID: uuid.NullUUID{
+					UUID:  cat.ID,
+					Valid: true,
+				},
+				Price: uint32(l + 1*i + 1),
 			}
 			err := db.DB.Create(&post).Error
 			if err != nil {

@@ -2,12 +2,14 @@ package posts
 
 import (
 	"fmt"
+	"log"
+	"math"
+	"net/http"
+
 	"github.com/ElegantSoft/go-crud-starter/common"
 	"github.com/ElegantSoft/go-crud-starter/crud"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"math"
-	"net/http"
 )
 
 type Controller struct {
@@ -36,14 +38,16 @@ func (c *Controller) findAll(ctx *gin.Context) {
 
 	var result []model
 	var totalRows int64
+	api.Join = api.Join + ",category"
 	err := c.service.Find(api, &result, &totalRows)
 	if err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
 
 	var data interface{}
 	if api.Page > 0 {
+		log.Printf("pagination -> %v - %v - %v", totalRows, api.Limit, int(math.Ceil(float64(totalRows)/float64(api.Limit))))
 		data = map[string]interface{}{
 			"data":       result,
 			"total":      totalRows,

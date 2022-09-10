@@ -18,15 +18,15 @@ type GetAllRequest struct {
 }
 
 var filterConditions = map[string]string{
-	"$eq":      "=",
-	"$ne":      "!=",
-	"$gt":      ">",
-	"$lt":      "<",
-	"$gte":     ">=",
-	"$lte":     "<=",
-	"$cont":    "ILIKE",
-	"$isnull":  "IS NULL",
-	"$notnull": "IS NOT NULL",
+	"eq":      "=",
+	"ne":      "!=",
+	"gt":      ">",
+	"lt":      "<",
+	"gte":     ">=",
+	"lte":     "<=",
+	"cont":    "ILIKE",
+	"isnull":  "IS NULL",
+	"notnull": "IS NOT NULL",
 }
 
 type ById struct {
