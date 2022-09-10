@@ -2,7 +2,6 @@ package crud
 
 import (
 	"gorm.io/gorm"
-	"time"
 )
 
 type Repo[T any] interface {
@@ -27,7 +26,7 @@ func (r *Repository[T]) Update(cond *T, updatedColumns interface{}) error {
 }
 
 func (r *Repository[T]) Delete(cond *T) error {
-	if err := r.DB.Model(r.Model).Where(cond).Update("deleted_at", time.Now()); err != nil {
+	if err := r.DB.Model(r.Model).Delete(cond); err != nil {
 		return err.Error
 	}
 	return nil

@@ -75,7 +75,7 @@ func (c *Controller) findOne(ctx *gin.Context) {
 		return
 	}
 
-	api.Filter = append(api.Filter, fmt.Sprintf("id||$eq||%s", item.ID))
+	api.Filter = append(api.Filter, fmt.Sprintf("id||eq||%s", item.ID))
 
 	var result model
 
@@ -112,21 +112,18 @@ func (c *Controller) create(ctx *gin.Context) {
 func (c *Controller) delete(ctx *gin.Context) {
 	var item common.ById
 	if err := ctx.ShouldBindUri(&item); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	if err := ctx.ShouldBindUri(&item); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": common.ValidateErrors(err)})
-		return
-	}
-	id, err := uuid.FromBytes([]byte(item.ID))
+
+	id, err := uuid.ParseBytes([]byte(item.ID))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	err = c.service.Delete(&model{ID: id})
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "deleted"})
@@ -162,7 +159,7 @@ func (c *Controller) update(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "updated"})
+	ctx.JSON(http.StatusOK, item)
 }
 
 func NewController(service *Service) *Controller {

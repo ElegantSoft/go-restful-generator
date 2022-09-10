@@ -11,7 +11,8 @@ export const CategoryEdit = (props) => {
   return (
     <Edit {...props}>
       <SimpleForm redirect="list">
-        <TextInput source="name" label="الاسم" />
+        <TextInput source="title" label="الاسم" />
+        <TextInput source="description" label="الاسم" />
       </SimpleForm>
     </Edit>
   )

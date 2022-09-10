@@ -7,17 +7,12 @@ import {
   TopToolbar,
 } from "react-admin"
 
-const PostShowActions = ({ basePath, data }) => (
-  <TopToolbar>
-    <EditButton basePath={basePath} record={data} />
-  </TopToolbar>
-)
 
-export const CategoryShow = (props) => (
-  <Show {...props} actions={<PostShowActions {...props} />}>
+export const CategoryShow = () =>
+  <Show >
     <SimpleShowLayout>
       <TextField source="id" />
-      <TextField source="name" />
+      <TextField source="title" />
     </SimpleShowLayout>
   </Show>
-)
+
