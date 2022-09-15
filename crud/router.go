@@ -5,9 +5,9 @@ import (
 	"math"
 	"net/http"
 
-	"github.com/ElegantSoft/go-crud-starter/server/common"
-	"github.com/ElegantSoft/go-crud-starter/server/db"
-	"github.com/ElegantSoft/go-crud-starter/server/db/models"
+	"github.com/ElegantSoft/go-crud-starter/common"
+	"github.com/ElegantSoft/go-crud-starter/db"
+	"github.com/ElegantSoft/go-crud-starter/db/models"
 	"github.com/gin-gonic/gin"
 )
 

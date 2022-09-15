@@ -1,4 +1,4 @@
-module github.com/ElegantSoft/go-crud-starter/server
+module github.com/ElegantSoft/go-crud-starter
 
 go 1.18
 

@@ -6,8 +6,8 @@ import (
 	"math"
 	"net/http"
 
-	"github.com/ElegantSoft/go-crud-starter/server/common"
-	"github.com/ElegantSoft/go-crud-starter/server/crud"
+	"github.com/ElegantSoft/go-crud-starter/common"
+	"github.com/ElegantSoft/go-crud-starter/crud"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
