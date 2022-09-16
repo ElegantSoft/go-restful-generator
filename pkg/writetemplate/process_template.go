@@ -1,30 +1,36 @@
 package writetemplate
 
 import (
-	"bufio"
-	"bytes"
-	"fmt"
-	"github.com/Masterminds/sprig"
-	"go/format"
+	"html/template"
 	"log"
 	"os"
-	"text/template"
 )
 
 func ProcessTemplate(templatePath string, fileName string, outputPath string, data interface{}) {
-	tmpl := template.Must(template.New("").Funcs(sprig.FuncMap()).ParseFiles(templatePath))
-	var processed bytes.Buffer
-	err := tmpl.ExecuteTemplate(&processed, fileName, data)
+	tmpl := template.Must(template.New("").Parse(templatePath))
+	f, err := os.Create(outputPath)
 	if err != nil {
-		log.Fatalf("Unable to parse data into template: %v\n", err)
+		log.Println("create file: ", err)
+		return
 	}
-	formatted, err := format.Source(processed.Bytes())
+	err = tmpl.Execute(f, data)
 	if err != nil {
-		log.Fatalf("Could not format processed template: %v\n", err)
+		log.Print("execute: ", err)
+		return
 	}
-	fmt.Println("Writing file: ", outputPath)
-	f, _ := os.Create(outputPath)
-	w := bufio.NewWriter(f)
-	w.WriteString(string(formatted))
-	w.Flush()
+	log.Printf("create file: %s", fileName)
+	//var processed bytes.Buffer
+	//err := tmpl.ExecuteTemplate(&processed, fileName, data)
+	//if err != nil {
+	//	log.Fatalf("Unable to parse data into template: %v\n", err)
+	//}
+	//formatted, err := format.Source(processed.Bytes())
+	//if err != nil {
+	//	log.Fatalf("Could not format processed template: %v\n", err)
+	//}
+	//fmt.Println("Writing file: ", outputPath)
+	//f, _ := os.Create(outputPath)
+	//w := bufio.NewWriter(f)
+	//w.WriteString(string(formatted))
+	//w.Flush()
 }

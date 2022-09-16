@@ -1,6 +1,7 @@
 package generators
 
 import (
+	_ "embed"
 	"fmt"
 	"github.com/ElegantSoft/go-crud-starter/pkg/writetemplate"
 	"github.com/manifoldco/promptui"
@@ -11,7 +12,9 @@ import (
 )
 
 var wd, _ = os.Getwd()
-var mainTemplate = filepath.Join(wd, "templates", "main.tmpl")
+
+//go:embed templates/main.tmpl
+var mainTemplate string
 
 func Execute() {
 
@@ -34,5 +37,5 @@ func Execute() {
 	dirname := filepath.Dir(filename)
 	log.Printf("Dir name is %s\n", dirname)
 
-	writetemplate.ProcessTemplate("templates/main.tmpl", "main.tmpl", filepath.Join("_example", "main.go"), data)
+	writetemplate.ProcessTemplate(mainTemplate, "main.tmpl", filepath.Join("_example", "main.go"), data)
 }
