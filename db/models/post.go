@@ -6,14 +6,14 @@ import (
 )
 
 type Post struct {
-	ID          uuid.UUID `json:"id,omitempty" gorm:"type:uuid; default:uuid_generate_v4()"`
-	Title       string    `json:"title,omitempty"`
-	Description string    `json:"description,omitempty"`
+	ID          uuid.UUID     `json:"id,omitempty" gorm:"type:uuid; default:uuid_generate_v4()"`
+	Title       string        `json:"title,omitempty"`
+	Description string        `json:"description,omitempty"`
 	CategoryID  uuid.NullUUID `json:"category_id,omitempty"`
-	Category    *Category `json:"category,omitempty"`
-	Price       uint32   `json:"price,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
+	Category    *Category     `json:"category,omitempty"`
+	Price       uint32        `json:"price,omitempty"`
+	UpdatedAt   time.Time     `json:"updated_at,omitempty"`
+	CreatedAt   time.Time     `json:"created_at,omitempty"`
 }
 
 type Category struct {
