@@ -8,8 +8,6 @@ import (
 	"go/format"
 	"log"
 	"os"
-	"path/filepath"
-	"runtime"
 	"text/template"
 )
 
@@ -27,9 +25,6 @@ func ProcessTemplate(templatePath string, fileName string, outputPath string, da
 	fmt.Println("Writing file: ", outputPath)
 	f, _ := os.Create(outputPath)
 	w := bufio.NewWriter(f)
-	_, filename, _, _ := runtime.Caller(0)
-	dirname := filepath.Dir(filename)
-	log.Printf("Dir name is %s\n", dirname)
 	w.WriteString(string(formatted))
 	w.Flush()
 }

@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 var wd, _ = os.Getwd()
@@ -29,6 +30,9 @@ func Execute() {
 	}
 	data := Data{PackageName: result}
 	log.Printf("Prompt %v", filepath.Join("$GOPATH", "src", "github.com"))
+	_, filename, _, _ := runtime.Caller(-1)
+	dirname := filepath.Dir(filename)
+	log.Printf("Dir name is %s\n", dirname)
 
 	writetemplate.ProcessTemplate("templates/main.tmpl", "main.tmpl", filepath.Join("_example", "main.go"), data)
 }
