@@ -3,15 +3,15 @@ package main
 import (
 	"log"
 	"os"
-	"{{. PackageName}}/db"
+	"{{.PackageName}}/db"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"{{. PackageName}}/db/models"
-	_ "{{. PackageName}}/docs"
+	"{{.PackageName}}/db/models"
+	_ "{{.PackageName}}/docs"
 )
 
 // @contact.name   API Support

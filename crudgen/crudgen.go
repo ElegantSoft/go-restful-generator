@@ -1,4 +1,4 @@
-package main
+package crudgen
 
 import (
 	"fmt"
@@ -23,8 +23,4 @@ func Execute() {
 	}
 	data := Data{PackageName: result}
 	writetemplate.ProcessTemplate("./../../templates/main.tmpl", "main.go", data)
-}
-
-func main() {
-	Execute()
 }
