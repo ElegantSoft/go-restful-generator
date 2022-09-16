@@ -29,10 +29,6 @@ func Execute() {
 	}
 	data := Data{PackageName: result}
 	log.Printf("Prompt %v", filepath.Join("$GOPATH", "src", "github.com"))
-	s, err := filepath.Abs("template/main.tmpl")
-	if err != nil {
-		log.Printf("Error %v", err)
-	}
-	log.Printf("File is %v", s)
+
 	writetemplate.ProcessTemplate("templates/main.tmpl", "main.tmpl", filepath.Join("_example", "main.go"), data)
 }

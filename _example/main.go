@@ -1,17 +1,17 @@
 package main
 
 import (
-	"ds/db"
 	"log"
 	"os"
+	"sd/db"
 
-	"ds/db/models"
-	_ "ds/docs"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"sd/db/models"
+	_ "sd/docs"
 )
 
 // @contact.name   API Support
