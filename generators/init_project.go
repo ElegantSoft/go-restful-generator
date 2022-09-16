@@ -8,6 +8,9 @@ import (
 	"path/filepath"
 )
 
+var wd, _ = os.Getwd()
+var mainTemplate = filepath.Join(wd, "templates", "main.tmpl")
+
 func Execute() {
 
 	prompt := promptui.Prompt{
@@ -24,8 +27,5 @@ func Execute() {
 		PackageName string
 	}
 	data := Data{PackageName: result}
-
-	appPath, _ := os.Getwd()
-
-	writetemplate.ProcessTemplate(filepath.Join(appPath, "templates/main.tmpl"), "main.tmpl", filepath.Join("_example", "main.go"), data)
+	writetemplate.ProcessTemplate(mainTemplate, "main.tmpl", filepath.Join("_example", "main.go"), data)
 }
