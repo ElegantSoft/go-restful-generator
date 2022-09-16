@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ElegantSoft/go-crud-starter/pkg/writetemplate"
 	"github.com/manifoldco/promptui"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -27,5 +28,7 @@ func Execute() {
 		PackageName string
 	}
 	data := Data{PackageName: result}
-	writetemplate.ProcessTemplate(mainTemplate, "main.tmpl", filepath.Join("_example", "main.go"), data)
+	log.Printf("Prompt %v", filepath.Join("$GOPATH", "src", "github.com"))
+
+	writetemplate.ProcessTemplate("../../templates/main.tmpl", "main.tmpl", filepath.Join("_example", "main.go"), data)
 }
