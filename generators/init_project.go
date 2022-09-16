@@ -24,7 +24,8 @@ func Execute() {
 		PackageName string
 	}
 	data := Data{PackageName: result}
-	wd, _ := os.Getwd()
 
-	writetemplate.ProcessTemplate(filepath.Join(wd, "templates", "main.tmpl"), "main.tmpl", filepath.Join("_example", "main.go"), data)
+	appPath, _ := os.Getwd()
+
+	writetemplate.ProcessTemplate(filepath.Join(appPath, "templates/main.tmpl"), "main.tmpl", filepath.Join("_example", "main.go"), data)
 }
