@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"github.com/Masterminds/sprig"
 	"go/format"
-	"html/template"
 	"log"
 	"os"
+	"text/template"
 )
 
-func ProcessTemplate(fileName string, outputPath string, data interface{}) {
-	tmpl := template.Must(template.New("").Funcs(sprig.FuncMap()).ParseFiles(fileName))
+func ProcessTemplate(templatePath string, fileName string, outputPath string, data interface{}) {
+	tmpl := template.Must(template.New("").Funcs(sprig.FuncMap()).ParseFiles(templatePath))
 	var processed bytes.Buffer
 	err := tmpl.ExecuteTemplate(&processed, fileName, data)
 	if err != nil {

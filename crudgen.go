@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/ElegantSoft/go-crud-starter/crudgen"
+	"github.com/ElegantSoft/go-crud-starter/generators"
 )
 
 func main() {
-	crudgen.Execute()
+	generators.Execute()
 }
