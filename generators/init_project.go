@@ -16,6 +16,12 @@ var databaseTemplate string
 //go:embed templates/db/migrations.tmpl
 var migrationsTemplate string
 
+//go:embed templates/env.tmpl
+var envTemplate string
+
+//go:embed templates/gitignore.tmpl
+var gitignoreTemplate string
+
 func InitNewProject(packageName string) {
 
 	type Data struct {
@@ -34,5 +40,7 @@ func InitNewProject(packageName string) {
 	}
 	writetemplate.ProcessTemplate(databaseTemplate, "database.tmpl", filepath.Join("db/database.go"), data)
 	writetemplate.ProcessTemplate(migrationsTemplate, "migrations.tmpl", filepath.Join("db/migrations.go"), data)
+	writetemplate.ProcessTemplate(envTemplate, "env.tmpl", filepath.Join(".env"), data)
+	writetemplate.ProcessTemplate(gitignoreTemplate, "gitignore.tmpl", filepath.Join(".gitignore"), data)
 
 }
