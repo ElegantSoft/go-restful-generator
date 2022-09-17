@@ -80,7 +80,7 @@ func removeDuplicateAdjacent(checkText string) string {
 }
 
 func GetModuleName() string {
-	goModBytes, err := os.ReadFile("../go.mod")
+	goModBytes, err := os.ReadFile("go.mod")
 	if err != nil {
 		panic(err)
 	}
