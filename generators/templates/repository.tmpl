@@ -1,4 +1,4 @@
-package {{.ServiceName}}
+package {{.ServiceName | camelcase | lower}}
 
 import (
 	"github.com/ElegantSoft/go-crud-starter/crud"
@@ -6,7 +6,7 @@ import (
 	"{{.PackageName}}/db/models"
 )
 
-type model = models.{{.ServiceName | title}}
+type model = models.{{.ServiceName | camelcase | title}}
 
 type Repository struct {
 	crud.Repository[model]

@@ -1,4 +1,4 @@
-package {{.ServiceName}}
+package {{.ServiceName | camelcase | lower}}
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ type Controller struct {
 // @param    join    query  string    false  "join relations eg: category, parent"
 // @param    filter  query  []string  false  "filters eg: name||eq||ad price||gte||200"
 // @param    sort    query  []string  false  "filters eg: created_at,desc title,asc"
-// @Router   /api/v1/{{.ServiceName}} [get]
+// @Router   /api/v1/{{.ServiceName | kebabcase}} [get]
 func (c *Controller) findAll(ctx *gin.Context) {
 	var api crud.GetAllRequest
 	if api.Limit == 0 {
@@ -38,7 +38,6 @@ func (c *Controller) findAll(ctx *gin.Context) {
 
 	var result []model
 	var totalRows int64
-	api.Join = api.Join + ",category"
 	err := c.service.Find(api, &result, &totalRows)
 	if err != nil {
 		ctx.JSON(400, gin.H{"message": err.Error()})
@@ -62,7 +61,7 @@ func (c *Controller) findAll(ctx *gin.Context) {
 // @Success  200  {object}  model
 // @Tags     {{.ServiceName}}
 // @param    id    path  string  true  "uuid of item"
-// @Router   /api/v1/{{.ServiceName}}/{id} [get]
+// @Router   /api/v1/{{.ServiceName | kebabcase}}/{id} [get]
 func (c *Controller) findOne(ctx *gin.Context) {
 	var api crud.GetAllRequest
 	var item common.ById
@@ -90,7 +89,7 @@ func (c *Controller) findOne(ctx *gin.Context) {
 // @Success  201  {object}  model
 // @Tags     {{.ServiceName}}
 // @param    {object}  body  model  true  "item to create"
-// @Router   /api/v1/{{.ServiceName}} [post]
+// @Router   /api/v1/{{.ServiceName | kebabcase}} [post]
 func (c *Controller) create(ctx *gin.Context) {
 	var item model
 	if err := ctx.ShouldBind(&item); err != nil {
@@ -108,7 +107,7 @@ func (c *Controller) create(ctx *gin.Context) {
 // @Success  200  {string}  string  "ok"
 // @Tags     {{.ServiceName}}
 // @param    id  path  string  true  "uuid of item"
-// @Router   /api/v1/{{.ServiceName}}/{id} [delete]
+// @Router   /api/v1/{{.ServiceName | kebabcase}}/{id} [delete]
 func (c *Controller) delete(ctx *gin.Context) {
 	var item common.ById
 	if err := ctx.ShouldBindUri(&item); err != nil {
@@ -133,7 +132,7 @@ func (c *Controller) delete(ctx *gin.Context) {
 // @Tags     {{.ServiceName}}
 // @param    id  path  string  true  "uuid of item"
 // @param    item  body  model   true  "update body"
-// @Router   /api/v1/{{.ServiceName}}/{id} [put]
+// @Router   /api/v1/{{.ServiceName | kebabcase}}/{id} [patch]
 func (c *Controller) update(ctx *gin.Context) {
 	var item model
 	var byId common.ById
