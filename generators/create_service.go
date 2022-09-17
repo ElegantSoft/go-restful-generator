@@ -30,6 +30,7 @@ func GenerateService(packageName string, serviceName string, servicePath string)
 		PackageName string
 		ServiceName string
 	}
+	serviceName = strcase.ToCamel(serviceName)
 	data := Data{PackageName: packageName, ServiceName: serviceName}
 	if servicePath == "" {
 		servicePath = "lib/" + strcase.ToKebab(serviceName)
