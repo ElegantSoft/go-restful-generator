@@ -2,6 +2,7 @@
 
  import (
  	"gorm.io/driver/sqlite"
+ 	"gorm.io/driver/postgres"
  	"gorm.io/gorm"
  	"gorm.io/gorm/logger"
  	"log"
@@ -22,7 +23,7 @@
  		},
  	)
  	var err error
- 	DB, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{
+ 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
  		Logger:                 newLogger,
  		SkipDefaultTransaction: true,
  		PrepareStmt:            false,
