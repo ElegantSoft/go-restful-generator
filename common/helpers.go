@@ -3,7 +3,6 @@ package common
 import (
 	"fmt"
 	"golang.org/x/mod/modfile"
-	"io/ioutil"
 	"os"
 	"reflect"
 )
@@ -82,7 +81,7 @@ func removeDuplicateAdjacent(checkText string) string {
 }
 
 func GetModuleName() string {
-	goModBytes, err := ioutil.ReadFile("go.mod")
+	goModBytes, err := os.ReadFile("go.mod")
 	if err != nil {
 		panic(err)
 	}

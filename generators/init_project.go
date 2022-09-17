@@ -3,13 +3,18 @@ package generators
 import (
 	_ "embed"
 	"github.com/ElegantSoft/go-crud-starter/pkg/writetemplate"
-	"log"
+	"os"
 	"path/filepath"
-	"runtime"
 )
 
 //go:embed templates/main.tmpl
 var mainTemplate string
+
+//go:embed templates/db/database.tmpl
+var databaseTemplate string
+
+//go:embed templates/db/migrations.tmpl
+var migrationsTemplate string
 
 func InitNewProject(packageName string) {
 
@@ -17,10 +22,17 @@ func InitNewProject(packageName string) {
 		PackageName string
 	}
 	data := Data{PackageName: packageName}
-	log.Printf("Prompt %v", filepath.Join("$GOPATH", "src", "github.com"))
-	_, filename, _, _ := runtime.Caller(-1)
-	dirname := filepath.Dir(filename)
-	log.Printf("Dir name is %s\n", dirname)
 
-	writetemplate.ProcessTemplate(mainTemplate, "main.tmpl", filepath.Join("_example", "main.go"), data)
+	writetemplate.ProcessTemplate(mainTemplate, "main.tmpl", filepath.Join("main.go"), data)
+	err := os.Mkdir("db", os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	err = os.Mkdir("lib", os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	writetemplate.ProcessTemplate(databaseTemplate, "database.tmpl", filepath.Join("db/database.go"), data)
+	writetemplate.ProcessTemplate(migrationsTemplate, "migrations.tmpl", filepath.Join("db/migrations.go"), data)
+
 }

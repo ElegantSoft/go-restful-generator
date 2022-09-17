@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/ElegantSoft/go-crud-starter/common"
+	"github.com/ElegantSoft/go-crud-starter/generators"
 	"github.com/manifoldco/promptui"
-	"log"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 		panic("not implemented")
 	case 1:
 		moduleName := common.GetModuleName()
-		log.Printf("module name: %s", moduleName)
+		generators.InitNewProject(moduleName)
 	default:
 		panic("not implemented")
 	}
