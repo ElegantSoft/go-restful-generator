@@ -10,7 +10,6 @@ import (
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"{{.PackageName}}/db/models"
 	_ "{{.PackageName}}/docs"
 )
 
@@ -49,14 +48,14 @@ func main() {
 	})
 
 	// migrations
-	db.AddUUIDExtension()
+	// TODO: run this migration if u need uuid support for postgres
+	// db.AddUUIDExtension()
 
-	if err := db.DB.AutoMigrate(
-		models.Category{},
-		models.Post{},
-	); err != nil {
-		log.Fatal(err)
-	}
+	// if err := db.DB.AutoMigrate(
+	// TODO: add models here to auto migrate
+	// ); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	server.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
