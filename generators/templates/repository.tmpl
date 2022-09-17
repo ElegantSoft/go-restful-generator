@@ -6,7 +6,7 @@ import (
 	"{{.PackageName}}/db/models"
 )
 
-type model = models.{{.ServiceName}}
+type model = models.{{.ServiceName | title}}
 
 type Repository struct {
 	crud.Repository[model]

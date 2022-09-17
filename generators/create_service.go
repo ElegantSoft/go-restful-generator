@@ -39,7 +39,8 @@ func GenerateService(packageName string, serviceName string, servicePath string)
 
 	err := os.MkdirAll(servicePath, os.ModePerm)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+		return
 	}
 
 	writetemplate.ProcessTemplate(routerTemplate, "router.tmpl", filepath.Join(servicePath, "router.go"), data)

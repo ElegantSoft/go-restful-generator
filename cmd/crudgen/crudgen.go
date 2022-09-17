@@ -39,7 +39,8 @@ func main() {
 		Short: "generate new service",
 		Run: func(cmd *cobra.Command, args []string) {
 			if serviceName == "" {
-				panic("you must set service name")
+				log.Fatal("you must set service name ex: --name posts")
+				return
 			}
 			generators.GenerateService(moduleName, serviceName, servicePath)
 		},
