@@ -5,7 +5,6 @@ import (
 	"math"
 	"net/http"
 
-	"github.com/ElegantSoft/go-crud-starter/common"
 	"github.com/ElegantSoft/go-crud-starter/db"
 	"github.com/ElegantSoft/go-crud-starter/db/models"
 	"github.com/gin-gonic/gin"
@@ -51,7 +50,7 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 			return
 		}
 		if err := ctx.ShouldBindUri(&item); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": common.ValidateErrors(err)})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
