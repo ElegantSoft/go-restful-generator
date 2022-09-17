@@ -47,6 +47,6 @@ func GenerateService(packageName string, serviceName string, servicePath string)
 	writetemplate.ProcessTemplate(controllerTemplate, "controller.tmpl", filepath.Join(servicePath, "controller.go"), data)
 	writetemplate.ProcessTemplate(serviceTemplate, "service.tmpl", filepath.Join(servicePath, "service.go"), data)
 	writetemplate.ProcessTemplate(repositoryTemplate, "repository.tmpl", filepath.Join(servicePath, "repository.go"), data)
-	writetemplate.ProcessTemplate(modelTemplate, "model.tmpl", filepath.Join("db/models", serviceName+".go"), data)
+	writetemplate.ProcessTemplate(modelTemplate, "model.tmpl", filepath.Join("db/models", strcase.ToSnake(serviceName)+".go"), data)
 
 }
