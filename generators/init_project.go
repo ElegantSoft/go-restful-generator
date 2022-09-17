@@ -30,7 +30,7 @@ func InitNewProject(packageName string) {
 	data := Data{PackageName: packageName}
 
 	writetemplate.ProcessTemplate(mainTemplate, "main.tmpl", filepath.Join("main.go"), data)
-	err := os.Mkdir("db", os.ModePerm)
+	err := os.Mkdir("db/models", os.ModePerm)
 	if err != nil {
 		panic(err)
 	}

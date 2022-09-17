@@ -1,0 +1,22 @@
+package {{.ServiceName}}
+
+import (
+	"github.com/ElegantSoft/go-crud-starter/crud"
+	"{{.PackageName}}/db"
+	"{{.PackageName}}/db/models"
+)
+
+type model = models.{{.ServiceName}}
+
+type Repository struct {
+	crud.Repository[model]
+}
+
+func InitRepository() *Repository {
+	return &Repository{
+		Repository: crud.Repository[model]{
+			DB:    db.DB,
+			Model: &model{},
+		},
+	}
+}

@@ -1,34 +1,57 @@
 package main
 
 import (
+	"fmt"
 	"github.com/ElegantSoft/go-crud-starter/common"
 	"github.com/ElegantSoft/go-crud-starter/generators"
-	"github.com/manifoldco/promptui"
+	"github.com/spf13/cobra"
+	"log"
+	"os"
 )
 
 func main() {
 	//promptGetServiceName := promptui.Prompt{
 	//	Label: "service name",
 	//}
+	moduleName := common.GetModuleName()
 
-	promptSelectGenerator := promptui.Select{
-		Label: "choose generator",
-		Items: []string{"create new service", "init new project"},
+	rootCmd := &cobra.Command{
+		Use:   "crudgen",
+		Short: "crudgen gen cli tool",
+		Run: func(cmd *cobra.Command, args []string) {
+			log.Println("Please use crudgen init or crudgen service")
+		},
 	}
 
-	index, _, err := promptSelectGenerator.Run()
-	if err != nil {
-		panic(err)
-	}
-	switch index {
-	case 0:
-		panic("not implemented")
-	case 1:
-		moduleName := common.GetModuleName()
-		generators.InitNewProject(moduleName)
-	default:
-		panic("not implemented")
+	initCmd := &cobra.Command{
+		Use:   "init",
+		Short: "init new project structure",
+		Run: func(cmd *cobra.Command, args []string) {
+			generators.InitNewProject(moduleName)
+		},
 	}
 
-	//result, err := prompt.Run()
+	var serviceName string
+	var servicePath string
+
+	generateServiceCmd := &cobra.Command{
+		Use:   "service",
+		Short: "generate new service",
+		Run: func(cmd *cobra.Command, args []string) {
+			if serviceName == "" {
+				panic("you must set service name")
+			}
+			generators.GenerateService(moduleName, serviceName, servicePath)
+		},
+	}
+
+	rootCmd.PersistentFlags().StringVar(&serviceName, "name", "", "service name ex: posts")
+	rootCmd.PersistentFlags().StringVar(&servicePath, "path", "", "service path default lib/service-name ex: services/service-name")
+
+	rootCmd.AddCommand(initCmd, generateServiceCmd)
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

@@ -1,13 +1,14 @@
 package writetemplate
 
 import (
+	"github.com/Masterminds/sprig"
 	"html/template"
 	"log"
 	"os"
 )
 
 func ProcessTemplate(templatePath string, fileName string, outputPath string, data interface{}) {
-	tmpl := template.Must(template.New("").Parse(templatePath))
+	tmpl := template.Must(template.New("").Funcs(sprig.FuncMap()).Parse(templatePath))
 	f, err := os.Create(outputPath)
 	if err != nil {
 		log.Println("create file: ", err)

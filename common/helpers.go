@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"golang.org/x/mod/modfile"
 	"os"
 	"reflect"
@@ -87,7 +86,6 @@ func GetModuleName() string {
 	}
 
 	modName := modfile.ModulePath(goModBytes)
-	fmt.Fprintf(os.Stdout, "modName=%+v\n", modName)
 
 	return modName
 }
