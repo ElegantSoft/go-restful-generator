@@ -2,36 +2,21 @@ package generators
 
 import (
 	_ "embed"
-	"fmt"
 	"github.com/ElegantSoft/go-crud-starter/pkg/writetemplate"
-	"github.com/manifoldco/promptui"
 	"log"
-	"os"
 	"path/filepath"
 	"runtime"
 )
 
-var wd, _ = os.Getwd()
-
 //go:embed templates/main.tmpl
 var mainTemplate string
 
-func Execute() {
+func InitNewProject(packageName string) {
 
-	prompt := promptui.Prompt{
-		Label: "package name",
-	}
-
-	result, err := prompt.Run()
-
-	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
-		return
-	}
 	type Data struct {
 		PackageName string
 	}
-	data := Data{PackageName: result}
+	data := Data{PackageName: packageName}
 	log.Printf("Prompt %v", filepath.Join("$GOPATH", "src", "github.com"))
 	_, filename, _, _ := runtime.Caller(-1)
 	dirname := filepath.Dir(filename)
