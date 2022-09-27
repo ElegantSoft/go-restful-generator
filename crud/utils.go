@@ -116,7 +116,7 @@ func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
 		nestedRelationsSlice := strings.Split(relation, ".")
 		titledSlice := make([]string, len(nestedRelationsSlice))
 		for i, relation := range nestedRelationsSlice {
-			titledSlice[i] = cases.Title(language.English).String(relation)
+			titledSlice[i] = cases.Title(language.English, cases.NoLower).String(relation)
 		}
 		nestedRelation := strings.Join(titledSlice, ".")
 		if len(nestedRelation) > 0 {
