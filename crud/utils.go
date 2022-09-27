@@ -3,10 +3,11 @@ package crud
 import (
 	"errors"
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"log"
 	"strings"
 
-	"github.com/iancoleman/strcase"
 	"gorm.io/gorm"
 )
 
@@ -112,8 +113,14 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
 	relations := strings.Split(joinString, ",")
 	for _, relation := range relations {
-		if len(relation) > 0 {
-			tx.Preload(strcase.ToCamel(relation))
+		nestedRelationsSlice := strings.Split(relation, ".")
+		titledSlice := make([]string, len(nestedRelationsSlice))
+		for i, relation := range nestedRelationsSlice {
+			titledSlice[i] = cases.Title(language.English).String(relation)
+		}
+		nestedRelation := strings.Join(titledSlice, ".")
+		if len(nestedRelation) > 0 {
+			tx.Preload(nestedRelation)
 		}
 	}
 }
