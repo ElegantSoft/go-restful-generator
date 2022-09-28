@@ -11,7 +11,7 @@ type Service[T any] struct {
 	Qtb  *QueryToDBConverter
 }
 
-func (svc *Service[T]) Find(api GetAllRequest, result *interface{}, totalRows *int64) error {
+func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *int64) error {
 	var s map[string]interface{}
 	if len(api.S) > 0 {
 		err := json.Unmarshal([]byte(api.S), &s)
@@ -50,10 +50,10 @@ func (svc *Service[T]) Find(api GetAllRequest, result *interface{}, totalRows *i
 	if api.Page > 0 {
 		tx.Offset((api.Page - 1) * api.Limit)
 	}
-	return tx.Find(&result).Error
+	return tx.Find(result).Error
 }
 
-func (svc *Service[T]) FindOne(api GetAllRequest, result *interface{}) error {
+func (svc *Service[T]) FindOne(api GetAllRequest, result interface{}) error {
 	var s map[string]interface{}
 	if len(api.S) > 0 {
 		err := json.Unmarshal([]byte(api.S), &s)
@@ -84,7 +84,7 @@ func (svc *Service[T]) FindOne(api GetAllRequest, result *interface{}) error {
 	if err != nil {
 		return err
 	}
-	return tx.First(&result).Error
+	return tx.First(result).Error
 }
 
 func (svc *Service[T]) Create(data *T) error {
