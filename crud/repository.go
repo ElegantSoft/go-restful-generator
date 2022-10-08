@@ -6,7 +6,7 @@ import (
 
 type Repo[T any] interface {
 	FindOne(cond *T, dest *T) error
-	Update(cond *T, updatedColumns interface{}) error
+	Update(cond *T, updatedColumns *T) error
 	Delete(cond *T) error
 	Create(data *T) error
 	getTx() *gorm.DB
@@ -21,7 +21,7 @@ func (r *Repository[T]) FindOne(cond *T, dest *T) error {
 	return r.DB.Where(cond).First(dest).Error
 }
 
-func (r *Repository[T]) Update(cond *T, updatedColumns interface{}) error {
+func (r *Repository[T]) Update(cond *T, updatedColumns *T) error {
 	return r.DB.Model(r.Model).Select("*").Where(cond).Updates(updatedColumns).Error
 }
 
