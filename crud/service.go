@@ -95,7 +95,7 @@ func (svc *Service[T]) Delete(cond *T) error {
 	return svc.Repo.Delete(cond)
 }
 
-func (svc *Service[T]) Update(cond *T, updatedColumns interface{}) error {
+func (svc *Service[T]) Update(cond *T, updatedColumns *T) error {
 	return svc.Repo.Update(cond, updatedColumns)
 }
 
