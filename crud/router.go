@@ -11,7 +11,7 @@ import (
 )
 
 func RegisterRoutes(routerGroup *gin.RouterGroup) {
-	repo := NewRepository[models.Post](db.DB, &models.Post{})
+	repo := NewRepository[models.Post](db.DB, models.Post{})
 	s := NewService[models.Post](repo)
 
 	routerGroup.GET("", func(ctx *gin.Context) {
