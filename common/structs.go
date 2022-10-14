@@ -1,5 +1,7 @@
 package common
 
+import "github.com/google/uuid"
+
 type ById struct {
-	ID string `uri:"id" binding:"required"`
+	ID uuid.UUID `uri:"id" binding:"required"`
 }
