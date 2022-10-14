@@ -16,7 +16,7 @@ func InitRepository() *Repository {
 	return &Repository{
 		Repository: crud.Repository[model]{
 			DB:    db.DB,
-			Model: &model{},
+			Model: model{},
 		},
 	}
 }
