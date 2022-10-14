@@ -1,9 +1,9 @@
 package posts
 
 import (
-	"github.com/ElegantSoft/go-crud-starter/crud"
-	"github.com/ElegantSoft/go-crud-starter/db"
-	"github.com/ElegantSoft/go-crud-starter/db/models"
+	"github.com/ElegantSoft/go-restful-generator/crud"
+	"github.com/ElegantSoft/go-restful-generator/db"
+	"github.com/ElegantSoft/go-restful-generator/db/models"
 )
 
 type model = models.Post

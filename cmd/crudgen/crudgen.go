@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/ElegantSoft/go-crud-starter/common"
-	"github.com/ElegantSoft/go-crud-starter/generators"
+	"github.com/ElegantSoft/go-restful-generator/common"
+	"github.com/ElegantSoft/go-restful-generator/generators"
 	"github.com/spf13/cobra"
 	"log"
 	"os"

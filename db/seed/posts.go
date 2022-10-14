@@ -3,8 +3,8 @@ package seed
 import (
 	"log"
 
-	"github.com/ElegantSoft/go-crud-starter/db"
-	"github.com/ElegantSoft/go-crud-starter/db/models"
+	"github.com/ElegantSoft/go-restful-generator/db"
+	"github.com/ElegantSoft/go-restful-generator/db/models"
 	"github.com/bxcodec/faker/v3"
 	"github.com/google/uuid"
 )

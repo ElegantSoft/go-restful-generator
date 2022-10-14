@@ -2,7 +2,7 @@ package generators
 
 import (
 	_ "embed"
-	"github.com/ElegantSoft/go-crud-starter/pkg/writetemplate"
+	"github.com/ElegantSoft/go-restful-generator/pkg/writetemplate"
 	"os"
 	"path/filepath"
 )
