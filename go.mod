@@ -1,4 +1,4 @@
-module github.com/ElegantSoft/go-crud-starter
+module github.com/ElegantSoft/go-restful-generator
 
 go 1.18
 
