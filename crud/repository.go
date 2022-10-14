@@ -14,7 +14,7 @@ type Repo[T any] interface {
 
 type Repository[T any] struct {
 	DB    *gorm.DB
-	Model *T
+	Model T
 }
 
 func (r *Repository[T]) FindOne(cond *T, dest *T) error {
@@ -40,7 +40,7 @@ func (r *Repository[T]) getTx() *gorm.DB {
 	return r.DB.Model(r.Model)
 }
 
-func NewRepository[T any](db *gorm.DB, model *T) Repo[T] {
+func NewRepository[T any](db *gorm.DB, model T) Repo[T] {
 	return &Repository[T]{
 		DB:    db,
 		Model: model,
