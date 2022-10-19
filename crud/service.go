@@ -2,7 +2,6 @@ package crud
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
 )
 
@@ -19,7 +18,6 @@ func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *in
 			return err
 		}
 	}
-	log.Printf("page -> %v limit %v", api.Page, api.Limit)
 
 	tx := svc.Repo.getTx()
 	if len(api.Fields) > 0 {
@@ -30,7 +28,6 @@ func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *in
 		svc.Qtb.relationsMapper(api.Join, tx)
 	}
 
-	log.Printf("Filter: %v", api.Filter)
 	if len(api.Filter) > 0 {
 		svc.Qtb.filterMapper(api.Filter, tx)
 	}

@@ -2,7 +2,6 @@ package posts
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"net/http"
 
@@ -47,7 +46,6 @@ func (c *Controller) findAll(ctx *gin.Context) {
 
 	var data interface{}
 	if api.Page > 0 {
-		log.Printf("pagination -> %v - %v - %v", totalRows, api.Limit, int(math.Ceil(float64(totalRows)/float64(api.Limit))))
 		data = map[string]interface{}{
 			"data":       result,
 			"total":      totalRows,

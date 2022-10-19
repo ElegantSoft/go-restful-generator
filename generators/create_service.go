@@ -35,8 +35,6 @@ func GenerateService(packageName string, serviceName string, servicePath string)
 		servicePath = "lib/" + strcase.ToKebab(serviceName)
 	}
 
-	log.Printf("servicePath: %v", servicePath)
-
 	err := os.MkdirAll(servicePath, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)

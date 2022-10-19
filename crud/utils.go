@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"log"
 	"strings"
 
 	"gorm.io/gorm"
@@ -23,7 +22,6 @@ type QueryToDBConverter struct {
 }
 
 func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB) error {
-	log.Printf("search is -> %+v", s)
 	for k := range s {
 		if k == AND {
 			vals, ok := s[k].([]interface{})
@@ -45,7 +43,6 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 
 										if operatorKey == ContainOperator {
 											value = fmt.Sprintf("%%%s%%", value)
-											log.Println(value)
 										}
 										tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
 									}
@@ -82,7 +79,6 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 									} else {
 										if operatorKey == ContainOperator {
 											value = fmt.Sprintf("%%%s%%", value)
-											log.Println(value)
 										}
 										if i == 0 {
 											tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
