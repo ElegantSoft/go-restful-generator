@@ -17,7 +17,7 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 	routerGroup.GET("", func(ctx *gin.Context) {
 		var api GetAllRequest
 		if err := ctx.ShouldBindQuery(&api); err != nil {
-			ctx.JSON(400, gin.H{"error": err.Error()})
+			ctx.JSON(400, gin.H{"message": err.Error()})
 			return
 		}
 
@@ -25,7 +25,7 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 		var totalRows int64
 		err := s.Find(api, &result, &totalRows)
 		if err != nil {
-			ctx.JSON(400, gin.H{"error": err.Error()})
+			ctx.JSON(400, gin.H{"message": err.Error()})
 			return
 		}
 
@@ -46,11 +46,11 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 		var api GetAllRequest
 		var item ById
 		if err := ctx.ShouldBindQuery(&api); err != nil {
-			ctx.JSON(400, gin.H{"error": err.Error()})
+			ctx.JSON(400, gin.H{"message": err.Error()})
 			return
 		}
 		if err := ctx.ShouldBindUri(&item); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
 
@@ -60,7 +60,7 @@ func RegisterRoutes(routerGroup *gin.RouterGroup) {
 
 		err := s.FindOne(api, &result)
 		if err != nil {
-			ctx.JSON(400, gin.H{"error": err.Error()})
+			ctx.JSON(400, gin.H{"message": err.Error()})
 			return
 		}
 		ctx.JSON(200, result)

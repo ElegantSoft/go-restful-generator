@@ -31,7 +31,7 @@ func (c *Controller) findAll(ctx *gin.Context) {
 		api.Limit = 20
 	}
 	if err := ctx.ShouldBindQuery(&api); err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -65,11 +65,11 @@ func (c *Controller) findOne(ctx *gin.Context) {
 	var api crud.GetAllRequest
 	var item common.ById
 	if err := ctx.ShouldBindQuery(&api); err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
 	if err := ctx.ShouldBindUri(&item); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -79,7 +79,7 @@ func (c *Controller) findOne(ctx *gin.Context) {
 
 	err := c.service.FindOne(api, &result)
 	if err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
 	ctx.JSON(200, result)
@@ -92,12 +92,12 @@ func (c *Controller) findOne(ctx *gin.Context) {
 func (c *Controller) create(ctx *gin.Context) {
 	var item model
 	if err := ctx.ShouldBind(&item); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	err := c.service.Create(&item)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusCreated, gin.H{"data": item})
@@ -136,25 +136,25 @@ func (c *Controller) update(ctx *gin.Context) {
 	var item model
 	var byId common.ById
 	if err := ctx.ShouldBind(&item); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	if err := ctx.ShouldBindUri(&byId); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	id, err := uuid.Parse(byId.ID)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	if err := ctx.ShouldBindUri(&byId); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	err = c.service.Update(&model{ID: id}, &item)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, item)
