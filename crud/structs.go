@@ -24,6 +24,7 @@ var filterConditions = map[string]string{
 	"lt":      "<",
 	"gte":     ">=",
 	"lte":     "<=",
+	"$in":     "in",
 	"cont":    "ILIKE",
 	"isnull":  "IS NULL",
 	"notnull": "IS NOT NULL",
