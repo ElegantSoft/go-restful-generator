@@ -14,6 +14,7 @@ const (
 	ContainOperator = "cont"
 	NotNullOperator = "notnull"
 	IsNullOperator  = "isnull"
+	InOperator      = "$in"
 )
 
 var AndValueNotSlice = errors.New("the value of $and or $or not array")
@@ -39,6 +40,8 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 								if ok {
 									if operatorKey == NotNullOperator || operatorKey == IsNullOperator {
 										tx.Where(fmt.Sprintf("%s %s", whereField, operator))
+									} else if operatorKey == InOperator {
+										tx.Where(fmt.Sprintf("%s in", whereField), []interface{}{value})
 									} else {
 
 										if operatorKey == ContainOperator {
@@ -75,6 +78,12 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 											tx.Where(fmt.Sprintf("%s %s", whereField, operator))
 										} else {
 											tx.Or(fmt.Sprintf("%s %s", whereField, operator))
+										}
+									} else if operatorKey == InOperator {
+										if i == 0 {
+											tx.Where(fmt.Sprintf("%s in", whereField), []interface{}{value})
+										} else {
+											tx.Where(fmt.Sprintf("%s in", whereField), []interface{}{value})
 										}
 									} else {
 										if operatorKey == ContainOperator {
