@@ -83,7 +83,7 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 										if i == 0 {
 											tx.Where(fmt.Sprintf("%s IN ?", whereField), []string{value.(string)})
 										} else {
-											tx.Where(fmt.Sprintf("%s IN ?", whereField), []string{value.(string)})
+											tx.Or(fmt.Sprintf("%s IN ?", whereField), []string{value.(string)})
 										}
 									} else {
 										if operatorKey == ContainOperator {
