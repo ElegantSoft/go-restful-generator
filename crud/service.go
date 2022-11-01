@@ -2,6 +2,7 @@ package crud
 
 import (
 	"encoding/json"
+	"gorm.io/gorm"
 	"strings"
 )
 
@@ -10,12 +11,12 @@ type Service[T any] struct {
 	Qtb  *QueryToDBConverter
 }
 
-func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *int64) error {
+func (svc *Service[T]) FindTrx(api GetAllRequest, totalRows *int64) (error, *gorm.DB) {
 	var s map[string]interface{}
 	if len(api.S) > 0 {
 		err := json.Unmarshal([]byte(api.S), &s)
 		if err != nil {
-			return err
+			return err, nil
 		}
 	}
 
@@ -38,7 +39,7 @@ func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *in
 
 	err := svc.Qtb.searchMapper(s, tx)
 	if err != nil {
-		return err
+		return err, nil
 	}
 	tx.Count(totalRows)
 
@@ -46,6 +47,14 @@ func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *in
 
 	if api.Page > 0 {
 		tx.Offset((api.Page - 1) * api.Limit)
+	}
+	return nil, tx
+}
+
+func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *int64) error {
+	err, tx := svc.FindTrx(api, totalRows)
+	if err != nil {
+		return err
 	}
 	return tx.Find(result).Error
 }
