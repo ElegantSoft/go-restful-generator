@@ -44,15 +44,15 @@ func (svc *Service[T]) FindTrx(api GetAllRequest) (error, *gorm.DB) {
 
 	tx.Limit(api.Limit)
 
-	if api.Page > 0 {
-		tx.Offset((api.Page - 1) * api.Limit)
-	}
 	return nil, tx
 }
 
 func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *int64) error {
 	err, tx := svc.FindTrx(api)
 	tx.Count(totalRows)
+	if api.Page > 0 {
+		tx.Offset((api.Page - 1) * api.Limit)
+	}
 	if err != nil {
 		return err
 	}
