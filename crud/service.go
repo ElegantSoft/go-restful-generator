@@ -11,7 +11,7 @@ type Service[T any] struct {
 	Qtb  *QueryToDBConverter
 }
 
-func (svc *Service[T]) FindTrx(api GetAllRequest, totalRows *int64) (error, *gorm.DB) {
+func (svc *Service[T]) FindTrx(api GetAllRequest) (error, *gorm.DB) {
 	var s map[string]interface{}
 	if len(api.S) > 0 {
 		err := json.Unmarshal([]byte(api.S), &s)
@@ -41,7 +41,6 @@ func (svc *Service[T]) FindTrx(api GetAllRequest, totalRows *int64) (error, *gor
 	if err != nil {
 		return err, nil
 	}
-	tx.Count(totalRows)
 
 	tx.Limit(api.Limit)
 
@@ -52,7 +51,8 @@ func (svc *Service[T]) FindTrx(api GetAllRequest, totalRows *int64) (error, *gor
 }
 
 func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *int64) error {
-	err, tx := svc.FindTrx(api, totalRows)
+	err, tx := svc.FindTrx(api)
+	tx.Count(totalRows)
 	if err != nil {
 		return err
 	}
