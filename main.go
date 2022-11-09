@@ -69,7 +69,7 @@ func main() {
 
 	// seed.SeedPosts()
 
-	err := server.Run()
+	err := server.Run(":8081")
 	if err != nil {
 		log.Printf("error while starting server %+v", err)
 	}

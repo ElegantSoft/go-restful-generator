@@ -1,9 +1,9 @@
 
 
-GET http://localhost:8080/posts?page=1&s={"$and":[{"title": {"$cont": "cul"}}]}
+GET http://localhost:8081/posts?page=1&filter=id||$in||11c457ed-4fc4-4d65-b106-1b2732869ae2
 
 ### get one
-GET http://localhost:8080/posts/11c457ed-4fc4-4d65-b106-1b2732869ae2
+GET http://localhost:8081/posts/11c457ed-4fc4-4d65-b106-1b2732869ae2
 
 
 #{"title": {"$cont": "hAru"}}

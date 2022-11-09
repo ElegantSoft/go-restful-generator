@@ -41,7 +41,8 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 									if operatorKey == NotNullOperator || operatorKey == IsNullOperator {
 										tx.Where(fmt.Sprintf("%s %s", whereField, operator))
 									} else if operatorKey == InOperator {
-										tx.Where(fmt.Sprintf("%s IN (?)", whereField), []interface{}{value})
+										valSlice := strings.Split(value.(string), ",")
+										tx.Where(fmt.Sprintf("%s IN ?", whereField), valSlice)
 									} else {
 
 										if operatorKey == ContainOperator {
@@ -81,9 +82,11 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 										}
 									} else if operatorKey == InOperator {
 										if i == 0 {
-											tx.Where(fmt.Sprintf("%s IN (?)", whereField), []interface{}{value})
+											valSlice := strings.Split(value.(string), ",")
+											tx.Where(fmt.Sprintf("%s IN ?", whereField), valSlice)
 										} else {
-											tx.Or(fmt.Sprintf("%s IN (?)", whereField), []interface{}{value})
+											valSlice := strings.Split(value.(string), ",")
+											tx.Or(fmt.Sprintf("%s IN ?", whereField), valSlice)
 										}
 									} else {
 										if operatorKey == ContainOperator {
@@ -143,6 +146,9 @@ func (q *QueryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 
 						if filterParams[1] == ContainOperator {
 							tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), fmt.Sprintf("%%%s%%", filterParams[2]))
+						} else if filterParams[1] == InOperator {
+							valSlice := strings.Split(filterParams[2], ",")
+							tx.Where(fmt.Sprintf("%s IN ?", filterParams[0]), valSlice)
 						} else {
 							tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), filterParams[2])
 
