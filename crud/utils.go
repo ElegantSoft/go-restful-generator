@@ -41,7 +41,7 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 									if operatorKey == NotNullOperator || operatorKey == IsNullOperator {
 										tx.Where(fmt.Sprintf("%s %s", whereField, operator))
 									} else if operatorKey == InOperator {
-										tx.Where(fmt.Sprintf("%s IN (?)", whereField), []string{value.(string)})
+										tx.Where(fmt.Sprintf("%s IN ?", whereField), []interface{}{value})
 									} else {
 
 										if operatorKey == ContainOperator {
@@ -81,9 +81,9 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 										}
 									} else if operatorKey == InOperator {
 										if i == 0 {
-											tx.Where(fmt.Sprintf("%s IN (?)", whereField), []string{value.(string)})
+											tx.Where(fmt.Sprintf("%s IN ?", whereField), []interface{}{value})
 										} else {
-											tx.Or(fmt.Sprintf("%s IN (?)", whereField), []string{value.(string)})
+											tx.Or(fmt.Sprintf("%s IN ?", whereField), []interface{}{value})
 										}
 									} else {
 										if operatorKey == ContainOperator {
