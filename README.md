@@ -28,7 +28,10 @@ Fell free to make PR to add other frameworks or ORMs
 ### Install
 `go install github.com/ElegantSoft/go-restful-generator/cmd/crudgen@latest`
 
-`git clone git@github.com:ElegantSoft/go-crud-starter.git $your-project-name`
+- create new golang project
+- go get github.com/ElegantSoft/go-restful-generator@latest
+- create db/models folder for models
+- create db/db.go with package db for db connection
 
 
 `crudgen service --name service-name --path lib/apps/service-name`
