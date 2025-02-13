@@ -25,10 +25,11 @@ admin dashboard in no time. When I switched to golang I missed these productive 
 Fell free to make PR to add other frameworks or ORMs
 ## How to use
 
-### clone the repo
-`git clone git@github.com:ElegantSoft/go-crud-starter.git $your-project-name`
+### Install
+`go install github.com/ElegantSoft/go-restful-generator/cmd/crudgen@latest`
 
-`cd $your-project-name && rm -R .git`
+`crudgen init`
+`crudgen service --name service-name --path lib/apps/service-name`
 
 ### Configuration
 - Create `.env` file for configuration.
