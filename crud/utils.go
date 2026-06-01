@@ -3,11 +3,13 @@ package crud
 import (
 	"errors"
 	"fmt"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 const (
@@ -22,98 +24,81 @@ var AndValueNotSlice = errors.New("the value of $and or $or not array")
 type QueryToDBConverter struct {
 }
 
+// where applies a condition as AND (or==false) or OR (or==true).
+func (q *QueryToDBConverter) where(tx *gorm.DB, or bool, query interface{}, args ...interface{}) {
+	if or {
+		tx.Or(query, args...)
+	} else {
+		tx.Where(query, args...)
+	}
+}
+
+// applyCond validates the column and operator, then applies a parameterized
+// condition. Unknown columns or operators are dropped instead of being
+// interpolated into raw SQL.
+func (q *QueryToDBConverter) applyCond(tx *gorm.DB, or bool, field, operatorKey string, value interface{}) {
+	col, ok := resolveColumn(tx, field)
+	if !ok {
+		return
+	}
+	operator, known := filterConditions[operatorKey]
+	if !known {
+		return
+	}
+	qc := tx.Statement.Quote(col)
+
+	switch operatorKey {
+	case NotNullOperator, IsNullOperator:
+		q.where(tx, or, fmt.Sprintf("%s %s", qc, operator))
+	case InOperator:
+		str, ok := value.(string)
+		if !ok {
+			return
+		}
+		q.where(tx, or, fmt.Sprintf("%s IN ?", qc), strings.Split(str, ","))
+	case ContainOperator:
+		q.where(tx, or, fmt.Sprintf("%s %s ?", qc, operator), fmt.Sprintf("%%%v%%", value))
+	default:
+		q.where(tx, or, fmt.Sprintf("%s %s ?", qc, operator), value)
+	}
+}
+
 func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB) error {
 	for k := range s {
-		if k == AND {
-			vals, ok := s[k].([]interface{})
-			if !ok {
-				return AndValueNotSlice
-			}
-			for _, field := range vals {
-				keyAndVal, ok := field.(map[string]interface{})
-				if ok {
-					for whereField, whereVal := range keyAndVal {
-						whereValMap, ok := whereVal.(map[string]interface{})
-						if ok {
-							for operatorKey, value := range whereValMap {
-								operator, ok := filterConditions[operatorKey]
-								if ok {
-									if operatorKey == NotNullOperator || operatorKey == IsNullOperator {
-										tx.Where(fmt.Sprintf("%s %s", whereField, operator))
-									} else if operatorKey == InOperator {
-										valSlice := strings.Split(value.(string), ",")
-										tx.Where(fmt.Sprintf("%s IN ?", whereField), valSlice)
-									} else {
-
-										if operatorKey == ContainOperator {
-											value = fmt.Sprintf("%%%s%%", value)
-										}
-										tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
-									}
-								}
-							}
-
-						} else {
-
-							tx.Where(whereField, whereVal)
-						}
-					}
-				}
-			}
-		} else if k == OR {
-			vals, ok := s[k].([]interface{})
-			if !ok {
-				return AndValueNotSlice
-			}
-			for i, field := range vals {
-				keyAndVal, ok := field.(map[string]interface{})
-				if ok {
-					for whereField, whereVal := range keyAndVal {
-						whereValMap, ok := whereVal.(map[string]interface{})
-						if ok {
-							for operatorKey, value := range whereValMap {
-								operator, ok := filterConditions[operatorKey]
-								if ok {
-									if operatorKey == NotNullOperator || operatorKey == IsNullOperator {
-										if i == 0 {
-											tx.Where(fmt.Sprintf("%s %s", whereField, operator))
-										} else {
-											tx.Or(fmt.Sprintf("%s %s", whereField, operator))
-										}
-									} else if operatorKey == InOperator {
-										if i == 0 {
-											valSlice := strings.Split(value.(string), ",")
-											tx.Where(fmt.Sprintf("%s IN ?", whereField), valSlice)
-										} else {
-											valSlice := strings.Split(value.(string), ",")
-											tx.Or(fmt.Sprintf("%s IN ?", whereField), valSlice)
-										}
-									} else {
-										if operatorKey == ContainOperator {
-											value = fmt.Sprintf("%%%s%%", value)
-										}
-										if i == 0 {
-											tx.Where(fmt.Sprintf("%s %s ?", whereField, operator), value)
-										} else {
-											tx.Or(fmt.Sprintf("%s %s ?", whereField, operator), value)
-										}
-									}
-								}
-							}
-
-						} else {
-							if i == 0 {
-								tx.Where(whereField, whereVal)
-							} else {
-								tx.Or(whereField, whereVal)
-							}
-						}
-					}
-				}
-			}
-
+		var or bool
+		switch k {
+		case AND:
+			or = false
+		case OR:
+			or = true
+		default:
+			continue
 		}
 
+		vals, ok := s[k].([]interface{})
+		if !ok {
+			return AndValueNotSlice
+		}
+
+		for i, field := range vals {
+			keyAndVal, ok := field.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			for whereField, whereVal := range keyAndVal {
+				useOr := or && i > 0
+				if whereValMap, ok := whereVal.(map[string]interface{}); ok {
+					for operatorKey, value := range whereValMap {
+						q.applyCond(tx, useOr, whereField, operatorKey, value)
+					}
+				} else {
+					// equality shorthand: {"field": "value"}
+					if col, ok := resolveColumn(tx, whereField); ok {
+						q.where(tx, useOr, fmt.Sprintf("%s = ?", tx.Statement.Quote(col)), whereVal)
+					}
+				}
+			}
+		}
 	}
 	return nil
 }
@@ -136,25 +121,33 @@ func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
 func (q *QueryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 	for _, filter := range filters {
 		filterParams := strings.Split(filter, SEPARATOR)
-		if len(filterParams) >= 2 {
-			operator, ok := filterConditions[filterParams[1]]
-			if ok {
-				if filterParams[1] == NotNullOperator || filterParams[1] == IsNullOperator {
-					tx.Where(fmt.Sprintf("%s %s", filterParams[0], operator))
-				} else {
-					if len(filterParams) == 3 {
+		if len(filterParams) < 2 {
+			continue
+		}
+		operator, ok := filterConditions[filterParams[1]]
+		if !ok {
+			continue
+		}
+		col, ok := resolveColumn(tx, filterParams[0])
+		if !ok {
+			continue
+		}
+		qc := tx.Statement.Quote(col)
 
-						if filterParams[1] == ContainOperator {
-							tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), fmt.Sprintf("%%%s%%", filterParams[2]))
-						} else if filterParams[1] == InOperator {
-							valSlice := strings.Split(filterParams[2], ",")
-							tx.Where(fmt.Sprintf("%s IN ?", filterParams[0]), valSlice)
-						} else {
-							tx.Where(fmt.Sprintf("%s %s ?", filterParams[0], operator), filterParams[2])
-
-						}
-					}
-				}
+		switch filterParams[1] {
+		case NotNullOperator, IsNullOperator:
+			tx.Where(fmt.Sprintf("%s %s", qc, operator))
+		default:
+			if len(filterParams) != 3 {
+				continue
+			}
+			switch filterParams[1] {
+			case ContainOperator:
+				tx.Where(fmt.Sprintf("%s %s ?", qc, operator), fmt.Sprintf("%%%s%%", filterParams[2]))
+			case InOperator:
+				tx.Where(fmt.Sprintf("%s IN ?", qc), strings.Split(filterParams[2], ","))
+			default:
+				tx.Where(fmt.Sprintf("%s %s ?", qc, operator), filterParams[2])
 			}
 		}
 	}
@@ -163,10 +156,17 @@ func (q *QueryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 func (q *QueryToDBConverter) sortMapper(sorts []string, tx *gorm.DB) {
 	for _, sort := range sorts {
 		sortParams := strings.Split(sort, SortSeparator)
-		if len(sortParams) == 2 {
-			tx.Order(fmt.Sprintf("%s %s", sortParams[0], strings.ToLower(sortParams[1])))
-		} else {
-			tx.Order(fmt.Sprintf("%s desc", sortParams[0]))
+		col, ok := resolveColumn(tx, sortParams[0])
+		if !ok {
+			continue
 		}
+		desc := true
+		if len(sortParams) == 2 && strings.EqualFold(sortParams[1], "asc") {
+			desc = false
+		}
+		tx.Order(clause.OrderByColumn{
+			Column: clause.Column{Name: col},
+			Desc:   desc,
+		})
 	}
 }

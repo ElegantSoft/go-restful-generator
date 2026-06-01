@@ -22,8 +22,16 @@ func (svc *Service[T]) FindTrx(api GetAllRequest) (error, *gorm.DB) {
 
 	tx := svc.Repo.getTx()
 	if len(api.Fields) > 0 {
-		fields := strings.Split(api.Fields, ",")
-		tx.Select(fields)
+		raw := strings.Split(api.Fields, ",")
+		fields := make([]string, 0, len(raw))
+		for _, f := range raw {
+			if col, ok := resolveColumn(tx, strings.TrimSpace(f)); ok {
+				fields = append(fields, col)
+			}
+		}
+		if len(fields) > 0 {
+			tx.Select(fields)
+		}
 	}
 	if len(api.Join) > 0 {
 		svc.Qtb.relationsMapper(api.Join, tx)
@@ -71,8 +79,16 @@ func (svc *Service[T]) FindOne(api GetAllRequest, result interface{}) error {
 	tx := svc.Repo.getTx()
 
 	if len(api.Fields) > 0 {
-		fields := strings.Split(api.Fields, ",")
-		tx.Select(fields)
+		raw := strings.Split(api.Fields, ",")
+		fields := make([]string, 0, len(raw))
+		for _, f := range raw {
+			if col, ok := resolveColumn(tx, strings.TrimSpace(f)); ok {
+				fields = append(fields, col)
+			}
+		}
+		if len(fields) > 0 {
+			tx.Select(fields)
+		}
 	}
 	if len(api.Join) > 0 {
 		svc.Qtb.relationsMapper(api.Join, tx)
