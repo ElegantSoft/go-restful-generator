@@ -2,8 +2,9 @@ package crud
 
 import (
 	"encoding/json"
-	"gorm.io/gorm"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 type Service[T any] struct {
@@ -45,10 +46,10 @@ func (svc *Service[T]) FindTrx(api GetAllRequest) (error, *gorm.DB) {
 		svc.Qtb.sortMapper(api.Sort, tx)
 	}
 
-	err := svc.Qtb.searchMapper(s, tx)
-	if err != nil {
-		return err, nil
-	}
+	// err := svc.Qtb.searchMapper(s, tx)
+	// if err != nil {
+	// 	return err, nil
+	// }
 
 	tx.Limit(api.Limit)
 
