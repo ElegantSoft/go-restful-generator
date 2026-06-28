@@ -46,11 +46,6 @@ func (svc *Service[T]) FindTrx(api GetAllRequest) (error, *gorm.DB) {
 		svc.Qtb.sortMapper(api.Sort, tx)
 	}
 
-	// err := svc.Qtb.searchMapper(s, tx)
-	// if err != nil {
-	// 	return err, nil
-	// }
-
 	tx.Limit(api.Limit)
 
 	return nil, tx
@@ -103,10 +98,6 @@ func (svc *Service[T]) FindOne(api GetAllRequest, result interface{}) error {
 		svc.Qtb.sortMapper(api.Sort, tx)
 	}
 
-	err := svc.Qtb.searchMapper(s, tx)
-	if err != nil {
-		return err
-	}
 	return tx.First(result).Error
 }
 
