@@ -120,7 +120,9 @@ func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
 
 func (q *QueryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {
 	for _, filter := range filters {
-		filterParams := strings.Split(filter, SEPARATOR)
+		// limit to 3 parts so the value itself may contain the separator
+		// (e.g. "guest_id||eq||x||y" -> value is "x||y")
+		filterParams := strings.SplitN(filter, SEPARATOR, 3)
 		if len(filterParams) < 2 {
 			continue
 		}
