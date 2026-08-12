@@ -17,7 +17,6 @@ type Controller struct {
 
 // @Success  200  {array}  model
 // @Tags     posts
-// @param    s       query  string    false  "{'$and': [ {'title': { '$cont':'cul' } } ]}"
 // @param    fields  query  string    false  "fields to select eg: name,age"
 // @param    page    query  int       false  "page of pagination"
 // @param    limit   query  int       false  "limit of pagination"

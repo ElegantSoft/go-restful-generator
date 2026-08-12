@@ -64,10 +64,6 @@ paths:
   /posts:
     get:
       parameters:
-      - description: '{''$and'': [ {''title'': { ''$cont'':''cul'' } } ]}'
-        in: query
-        name: s
-        type: string
       - description: 'fields to select eg: name,age'
         in: query
         name: fields
