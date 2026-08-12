@@ -322,40 +322,6 @@ func TestJoinPreload(t *testing.T) {
 	}
 }
 
-func TestSearchAndOr(t *testing.T) {
-	svc, _, _ := newTestService(t)
-
-	t.Run("and", func(t *testing.T) {
-		out, _ := findAll(t, svc, GetAllRequest{
-			S: `{"$and":[{"price":{"gte":"100"}},{"price":{"lte":"200"}}]}`,
-		})
-		if len(out) != 3 {
-			t.Fatalf("$and => %d rows, want 3 (prices=%v)", len(out), prices(out))
-		}
-	})
-
-	t.Run("or", func(t *testing.T) {
-		out, _ := findAll(t, svc, GetAllRequest{
-			S: `{"$or":[{"price":{"eq":"50"}},{"price":{"eq":"500"}}]}`,
-		})
-		if len(out) != 2 {
-			t.Fatalf("$or => %d rows, want 2 (prices=%v)", len(out), prices(out))
-		}
-	})
-
-	t.Run("equality_shorthand", func(t *testing.T) {
-		out, _ := findAll(t, svc, GetAllRequest{
-			S: `{"$and":[{"title":"Rust Book"}]}`,
-		})
-		if len(out) != 1 {
-			t.Fatalf("shorthand => %d rows, want 1", len(out))
-		}
-		if out[0].Title != "Rust Book" {
-			t.Fatalf("title = %q", out[0].Title)
-		}
-	})
-}
-
 // ---------------------------------------------------------------------------
 // Security regression tests (injection must be closed, features intact)
 // ---------------------------------------------------------------------------
@@ -390,27 +356,6 @@ func TestSecurityFilterBooleanBypassDropped(t *testing.T) {
 	})
 	if len(out) != 1 {
 		t.Fatalf("len = %d, want 1 (boolean bypass must be dropped)", len(out))
-	}
-}
-
-func TestSecurityInNonStringNoPanic(t *testing.T) {
-	svc, _, _ := newTestService(t)
-	// Non-string $in value used to panic on value.(string); must be skipped now.
-	out, total := findAll(t, svc, GetAllRequest{
-		S: `{"$or":[{"price":{"$in":123}}]}`,
-	})
-	if total != 8 || len(out) != 8 {
-		t.Fatalf("got total=%d len=%d, want 8/8 (condition skipped, no panic)", total, len(out))
-	}
-}
-
-func TestSecurityUnknownColumnInSearchDropped(t *testing.T) {
-	svc, _, _ := newTestService(t)
-	out, _ := findAll(t, svc, GetAllRequest{
-		S: `{"$and":[{"1=1) --":{"eq":"x"}}]}`,
-	})
-	if len(out) != 8 {
-		t.Fatalf("len = %d, want 8 (unknown column dropped)", len(out))
 	}
 }
 

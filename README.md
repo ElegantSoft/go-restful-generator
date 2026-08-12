@@ -10,7 +10,7 @@ admin dashboard in no time. When I switched to golang I missed these productive 
 
 ## Features
 - Full crud features
-- sorting, selecting and do complex filters like nested "and" & "or" queries
+- sorting, selecting and filtering
 - add joins and nested joins from uri
 - compatible with [ra-admin](https://www.radmin.com/)
 - inspired from [@nestjsx/crud](https://github.com/nestjsx/crud)
@@ -48,7 +48,6 @@ First you can see how crud api works by running project and go to `/docs/index.h
 ### requests params
 - [Query params](#query-params)
     - [select](#select)
-    - [search](#search)
     - [filter conditions](#filter-conditions)
     - [filter](#filter)
     - [or](#or)
@@ -67,8 +66,6 @@ First you can see how crud api works by running project and go to `/docs/index.h
 By default, we support these param names:
 
 `fields` - get selected fields in GET result
-
-`s` - search conditions (`$and`, `$or` with all possible variations)
 
 `filter` - filter GET result by `AND` type of condition
 
@@ -96,36 +93,6 @@ _Syntax:_
 _Example:_
 
 > ?fields=**email**,**name**
-
-### search
-
-Adds a search condition as a JSON string to you request. You can combine `$and`, `$or` and use any [condition](#filter-conditions) you need. Make sure it's being sent encoded or just use [`RequestQueryBuilder`](#frontend-usage)
-
-_Syntax:_
-
-> ?s={"name": "Michael"}
-
-_Some examples:_
-
-- Search by field `name` that can be either `null` OR equals `Superman`
-
-> ?s={"name": {"**\$or**": {"**\$isnull**": true, "**\$eq**": "Superman"}}}
-
-- Search an entity where `isActive` is `true` AND `createdAt` not equal `2008-10-01T17:04:32`
-
-> ?s={"**\$and**": [{"isActive": true}, {"createdAt": {"**$ne**": "2008-10-01T17:04:32"}}]}
-
-...which is the same as:
-
-> ?s={"isActive": true, "createdAt": {"**\$ne**": "2008-10-01T17:04:32"}}
-
-- Search an entity where `isActive` is `false` OR `updatedAt` is not `null`
-
-> ?s={"**\$or**": [{"isActive": false}, {"updatedAt": {"**$notnull**": true}}]}
-
-So the amount of combinations is really huge.
-
-**_Notice:_** if search query param is present, then [filter](#filter) and [or](#or) query params will be ignored.
 
 ### filter conditions
 

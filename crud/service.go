@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"encoding/json"
 	"strings"
 
 	"gorm.io/gorm"
@@ -13,13 +12,6 @@ type Service[T any] struct {
 }
 
 func (svc *Service[T]) FindTrx(api GetAllRequest) (error, *gorm.DB) {
-	var s map[string]interface{}
-	if len(api.S) > 0 {
-		err := json.Unmarshal([]byte(api.S), &s)
-		if err != nil {
-			return err, nil
-		}
-	}
 
 	tx := svc.Repo.getTx()
 	if len(api.Fields) > 0 {
@@ -64,13 +56,6 @@ func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *in
 }
 
 func (svc *Service[T]) FindOne(api GetAllRequest, result interface{}) error {
-	var s map[string]interface{}
-	if len(api.S) > 0 {
-		err := json.Unmarshal([]byte(api.S), &s)
-		if err != nil {
-			return err
-		}
-	}
 
 	tx := svc.Repo.getTx()
 

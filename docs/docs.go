@@ -32,12 +32,6 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "{'$and': [ {'title': { '$cont':'cul' } } ]}",
-                        "name": "s",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
                         "description": "fields to select eg: name,age",
                         "name": "fields",
                         "in": "query"
