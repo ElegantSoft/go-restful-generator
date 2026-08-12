@@ -261,6 +261,8 @@ func TestFilterOperators(t *testing.T) {
 		{"isnull", []string{"category_id||isnull"}, 2},
 		{"notnull", []string{"category_id||notnull"}, 6},
 		{"and_combo", []string{"price||gte||100", "price||lte||200"}, 3}, // 100,150,200
+		// the value itself may contain the separator; the filter must still apply
+		{"value_with_separator", []string{"title||eq||x||y"}, 0},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
