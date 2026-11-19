@@ -195,6 +195,15 @@ _Examples:_
 
 **_Notice:_** primary field/column always persists in relational objects. To use nested relations, the parent level **MUST** be set before the child level like example above.
 
+**_Join validation:_** every join path is validated before any query runs. Unknown relations, empty segments, wildcards (`*`) and paths that use the same relation twice (e.g. `Categories.Products.Categories`) are rejected with `crud.ErrInvalidJoin`, and paths deeper than the limit are rejected with `crud.ErrJoinDepthExceeded`. Both errors are returned by `Find` and `FindOne`, and the controllers map them to HTTP 400. The default depth limit is 3 levels (`crud.DefaultMaxJoinDepth`), e.g. `relation1.nested.deepnested`. To allow deeper joins, or to restrict joins to specific relations, configure the service:
+
+```go
+svc.Qtb.MaxJoinDepth = 4
+svc.Qtb.AllowedJoins = []string{"Categories.Products"} // parents of listed paths are allowed too
+```
+
+When `AllowedJoins` is empty, any relation of the model can be joined (up to the depth limit).
+
 ### limit
 
 Receive `N` amount of entities.
