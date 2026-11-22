@@ -1,11 +1,20 @@
 package crud
 
+import "errors"
+
 const (
 	AND           = "$and"
 	OR            = "$or"
 	SEPARATOR     = "||"
 	SortSeparator = ","
 )
+
+var (
+	ErrInvalidJoin       = errors.New("invalid join")
+	ErrJoinDepthExceeded = errors.New("join depth exceeded")
+)
+
+var DefaultMaxJoinDepth = 3
 
 type GetAllRequest struct {
 	Page   int      `json:"page" form:"page"`

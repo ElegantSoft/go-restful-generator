@@ -3,6 +3,7 @@ package crud
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"golang.org/x/text/cases"
@@ -22,6 +23,11 @@ const (
 var AndValueNotSlice = errors.New("the value of $and or $or not array")
 
 type QueryToDBConverter struct {
+	// MaxJoinDepth caps the number of nested levels in a join path. <=0 uses DefaultMaxJoinDepth.
+	MaxJoinDepth int
+	// AllowedJoins optionally restricts joins to these relation paths (or their parents).
+	// Empty means any relation of the model may be joined.
+	AllowedJoins []string
 }
 
 // where applies a condition as AND (or==false) or OR (or==true).
@@ -103,19 +109,104 @@ func (q *QueryToDBConverter) searchMapper(s map[string]interface{}, tx *gorm.DB)
 	return nil
 }
 
-func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) {
-	relations := strings.Split(joinString, ",")
-	for _, relation := range relations {
-		nestedRelationsSlice := strings.Split(relation, ".")
-		titledSlice := make([]string, len(nestedRelationsSlice))
-		for i, relation := range nestedRelationsSlice {
-			titledSlice[i] = cases.Title(language.English, cases.NoLower).String(relation)
+func (q *QueryToDBConverter) maxJoinDepth() int {
+	if q.MaxJoinDepth > 0 {
+		return q.MaxJoinDepth
+	}
+	return DefaultMaxJoinDepth
+}
+
+// normalizeJoinPath splits a dotted relation path and title-cases each segment,
+// matching how relation field names are written on the model.
+func normalizeJoinPath(relation string) ([]string, error) {
+	segments := strings.Split(relation, ".")
+	titled := make([]string, len(segments))
+	for i, segment := range segments {
+		segment = strings.TrimSpace(segment)
+		if segment == "" {
+			return nil, fmt.Errorf("%w: %q has an empty segment", ErrInvalidJoin, relation)
 		}
-		nestedRelation := strings.Join(titledSlice, ".")
-		if len(nestedRelation) > 0 {
-			tx.Preload(nestedRelation)
+		titled[i] = cases.Title(language.English, cases.NoLower).String(segment)
+	}
+	return titled, nil
+}
+
+// joinAllowed reports whether path equals an allowlist entry or is a parent of one.
+func (q *QueryToDBConverter) joinAllowed(path string) bool {
+	for _, entry := range q.AllowedJoins {
+		segments, err := normalizeJoinPath(entry)
+		if err != nil {
+			continue
+		}
+		allowed := strings.Join(segments, ".")
+		if allowed == path || strings.HasPrefix(allowed, path+".") {
+			return true
 		}
 	}
+	return false
+}
+
+// relationKey identifies one relation by the model that owns it and its name.
+type relationKey struct {
+	owner reflect.Type
+	name  string
+}
+
+// validateJoin checks one join path against the depth cap, the model's relation
+// graph, the optional allowlist and the rule that no relation may repeat within
+// the path, and returns the canonical path to preload.
+func (q *QueryToDBConverter) validateJoin(tx *gorm.DB, relation string) (string, error) {
+	segments, err := normalizeJoinPath(relation)
+	if err != nil {
+		return "", err
+	}
+	if maxDepth := q.maxJoinDepth(); len(segments) > maxDepth {
+		return "", fmt.Errorf("%w: %q has %d levels, max is %d", ErrJoinDepthExceeded, relation, len(segments), maxDepth)
+	}
+	current := ensureSchema(tx)
+	if current == nil {
+		return "", fmt.Errorf("%w: %q: model schema unavailable", ErrInvalidJoin, relation)
+	}
+	visited := make(map[relationKey]bool, len(segments))
+	for _, name := range segments {
+		rel, ok := current.Relationships.Relations[name]
+		if !ok || rel.FieldSchema == nil {
+			return "", fmt.Errorf("%w: %q is not a relation of the model", ErrInvalidJoin, relation)
+		}
+		key := relationKey{owner: current.ModelType, name: name}
+		if visited[key] {
+			return "", fmt.Errorf("%w: %q uses relation %s more than once", ErrInvalidJoin, relation, name)
+		}
+		visited[key] = true
+		current = rel.FieldSchema
+	}
+	path := strings.Join(segments, ".")
+	if len(q.AllowedJoins) > 0 && !q.joinAllowed(path) {
+		return "", fmt.Errorf("%w: %q is not allowed", ErrInvalidJoin, relation)
+	}
+	return path, nil
+}
+
+// relationsMapper validates every comma-separated join entry before preloading any
+// of them. On error it also records the error on tx, so the query cannot run.
+func (q *QueryToDBConverter) relationsMapper(joinString string, tx *gorm.DB) error {
+	var paths []string
+	for _, relation := range strings.Split(joinString, ",") {
+		relation = strings.TrimSpace(relation)
+		if relation == "" {
+			continue
+		}
+		path, err := q.validateJoin(tx, relation)
+		if err != nil {
+			tx.AddError(err)
+			return err
+		}
+		paths = append(paths, path)
+	}
+	for _, path := range paths {
+		tx.Preload(path)
+	}
+	return nil
 }
 
 func (q *QueryToDBConverter) filterMapper(filters []string, tx *gorm.DB) {

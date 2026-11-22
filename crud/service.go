@@ -27,7 +27,9 @@ func (svc *Service[T]) FindTrx(api GetAllRequest) (error, *gorm.DB) {
 		}
 	}
 	if len(api.Join) > 0 {
-		svc.Qtb.relationsMapper(api.Join, tx)
+		if err := svc.Qtb.relationsMapper(api.Join, tx); err != nil {
+			return err, tx
+		}
 	}
 
 	if len(api.Filter) > 0 {
@@ -45,12 +47,12 @@ func (svc *Service[T]) FindTrx(api GetAllRequest) (error, *gorm.DB) {
 
 func (svc *Service[T]) Find(api GetAllRequest, result interface{}, totalRows *int64) error {
 	err, tx := svc.FindTrx(api)
+	if err != nil {
+		return err
+	}
 	tx.Count(totalRows)
 	if api.Page > 0 {
 		tx.Offset((api.Page - 1) * api.Limit)
-	}
-	if err != nil {
-		return err
 	}
 	return tx.Find(result).Error
 }
@@ -72,7 +74,9 @@ func (svc *Service[T]) FindOne(api GetAllRequest, result interface{}) error {
 		}
 	}
 	if len(api.Join) > 0 {
-		svc.Qtb.relationsMapper(api.Join, tx)
+		if err := svc.Qtb.relationsMapper(api.Join, tx); err != nil {
+			return err
+		}
 	}
 
 	if len(api.Filter) > 0 {
